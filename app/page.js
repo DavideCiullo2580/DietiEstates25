@@ -3,6 +3,7 @@ import React from "react";
 import NotLoggedNavBar from "./Components/NotLoggedNavBar";
 import HomePage from "./Components/HomePage";
 import Login from "./Components/Login";
+import Footer from "./Components/Footer";
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
         <NotLoggedNavBar />
         <HomePage />
         <Login />
+        <Footer />
     </>
   );
 }
