@@ -1,7 +1,3 @@
-"use client";
-
-import Link from 'next/link';
-
 export default function Login() {
   return (
     <>
@@ -12,9 +8,9 @@ export default function Login() {
         {/* Colonna sinistra con sfondo e testo */}
         <div
           className="relative flex items-center justify-center bg-cover bg-center bg-no-repeat px-8 py-16"
-          style={{ backgroundImage: 'url("/immagine-accedi.jpg")' }}
+          style={{ backgroundImage: 'url("/homepage-background.png")' }}
         >
-          <div className="absolute inset-0 bg-gray-800 opacity-70 z-0"></div>
+          <div className="absolute inset-0 bg-black opacity-50 z-0"></div>
 
           <div className="relative z-10 max-w-md text-center text-white space-y-6">
             <h1 className="text-4xl font-bold leading-tight">
@@ -30,32 +26,44 @@ export default function Login() {
         </div>
 
         {/* Colonna destra: login */}
-        <div className="flex flex-col items-center justify-center px-6 py-16 bg-white shadow-xl">
+        <div className="flex items-center justify-center px-6 py-16 bg-white shadow-xl">
           <div className="w-full max-w-md">
-            <h2 className="text-3xl font-bold text-black mb-8 text-center">Accedi</h2>
+            <h2 className="text-3xl font-bold text-black mb-8 text-center">Invia candidatura</h2>
 
             <form className="space-y-6">
               <div>
                 <label htmlFor="login-username" className="block text-sm font-medium text-black mb-1">
-                  Username o Nome dell'agenzia
+                  Inserisci nome società
                 </label>
                 <input
                   type="text"
                   id="login-username"
                   className="block w-full px-4 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-black"
-                  placeholder="Inserisci il tuo username"
+                  placeholder="Inserisci il nome della società"
                 />
               </div>
 
               <div>
                 <label htmlFor="login-password" className="block text-sm font-medium text-black mb-1">
-                  Password
+                  Inserisci Pec
                 </label>
                 <input
                   type="password"
                   id="login-password"
                   className="block w-full px-4 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-black"
-                  placeholder="Inserisci la tua password"
+                  placeholder="Inserisci la tua pec"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="login-password" className="block text-sm font-medium text-black mb-1">
+                  Telefono
+                </label>
+                <input
+                  type="password"
+                  id="login-password"
+                  className="block w-full px-4 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-black"
+                  placeholder="Inserisci il tuo recapito telefonico"
                 />
               </div>
 
@@ -64,17 +72,9 @@ export default function Login() {
                 type="submit"
                 className="w-full py-3 bg-gray-200 hover:bg-gray-300 text-black font-semibold shadow transition duration-200"
               >
-                Accedi
+                Invia richiesta
               </button>
             </form>
-
-            {/* Testo sotto il form */}
-            <p className="mt-6 text-center text-sm text-gray-600">
-              Non hai un account?{' '}
-              <Link href="/signin" className="text-blue-600 hover:underline font-medium">
-                Registrati
-              </Link>
-            </p>
           </div>
         </div>
       </section>

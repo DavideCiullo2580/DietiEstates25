@@ -21,23 +21,20 @@ export default function NotLoggedNavBar() {
       <ul className="flex space-x-6">
         <li>
           <Link href="/" className="text-black hover:text-blue-600">
-            Home
+            Login
           </Link>
         </li>
         <li>
-          <Link href="/about" className="text-black hover:text-blue-600">
-            About
+          <Link href="/" className="text-black hover:text-blue-600">
+            Sign in
           </Link>
         </li>
         <li>
-          <Link href="/services" className="text-black hover:text-blue-600">
-            Services
+          <Link href="/SigninRequest" className="text-black hover:text-blue-600">
+            Collaborate With Us
           </Link>
         </li>
         <li>
-          <Link href="/contact" className="text-black hover:text-blue-600">
-            Contact
-          </Link>
         </li>
       </ul>
     </div>
