@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image';
 
 export default function NotLoggedNavBar() {
   return (
@@ -6,8 +7,13 @@ export default function NotLoggedNavBar() {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo a sinistra */}
-          <Link href="/" className="text-xl font-bold text-black">
-            MyApp
+          <Link href="/" className="flex items-center"> {/* Aggiunto 'flex items-center' per un buon allineamento verticale */}
+            <Image
+              src="/dietiestates25-logo.png" // Assicurati che questo percorso sia corretto (es. /logo.png se l'immagine è direttamente in public)
+              alt="DietiEstates25 Logo" // Testo alternativo per accessibilità
+              width={180} // Larghezza del logo in pixel (modifica se necessario)
+              height={50} // Altezza del logo in pixel (modifica se necessario)
+            />
           </Link>
 
           {/* Link a destra */}
