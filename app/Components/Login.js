@@ -1,3 +1,7 @@
+"use client";
+
+import Link from 'next/link';
+
 export default function Login() {
   return (
     <>
@@ -8,9 +12,9 @@ export default function Login() {
         {/* Colonna sinistra con sfondo e testo */}
         <div
           className="relative flex items-center justify-center bg-cover bg-center bg-no-repeat px-8 py-16"
-          style={{ backgroundImage: 'url("/homepage-background.png")' }}
+          style={{ backgroundImage: 'url("/immagine-accedi.jpg")' }}
         >
-          <div className="absolute inset-0 bg-black opacity-50 z-0"></div>
+          <div className="absolute inset-0 bg-gray-800 opacity-70 z-0"></div>
 
           <div className="relative z-10 max-w-md text-center text-white space-y-6">
             <h1 className="text-4xl font-bold leading-tight">
@@ -63,6 +67,14 @@ export default function Login() {
                 Accedi
               </button>
             </form>
+
+            {/* Testo sotto il form */}
+            <p className="mt-6 text-center text-sm text-gray-600">
+              Non hai un account?{' '}
+              <Link href="/signin" className="text-blue-600 hover:underline font-medium">
+                Registrati
+              </Link>
+            </p>
           </div>
         </div>
       </section>
