@@ -2,7 +2,7 @@ import { FaInstagram, FaFacebookF, FaXTwitter } from "react-icons/fa6";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-200 text-gray-800 py-10 px-6">
+    <footer className="bg-white text-gray-800 py-10 px-6 border-t border-black">
       <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 items-center text-center md:text-left">
         {/* Testo ispirazionale */}
         <div>

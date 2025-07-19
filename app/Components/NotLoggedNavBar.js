@@ -1,45 +1,120 @@
-import Link from 'next/link'
-import Image from 'next/image';
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 
 export default function NotLoggedNavBar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <nav className="bg-white border-b border-black sticky top-0 z-50 overflow-hidden">
-  <div className="max-w-7xl mx-auto px-4">
-    <div className="flex items-center justify-between h-20"> {/* qui cambiato da h-16 a h-20 */}
-      {/* Logo a sinistra */}
-      <Link href="/" className="flex items-center h-full">
-        <Image
-          src="/dietiestates25-logo.png"
-          alt="DietiEstates25 Logo"
-          width={180}
-          height={50}
-          className="block"
-        />
-      </Link>
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo a sinistra */}
+          <Link href="/" className="flex items-center h-full">
+            <Image
+              src="/dietiestates25-logo.png"
+              alt="DietiEstates25 Logo"
+              width={180}
+              height={50}
+              className="block"
+            />
+          </Link>
 
-      {/* Link a destra */}
-      <ul className="flex space-x-6">
-        <li>
-          <Link href="/" className="text-black hover:text-blue-600">
-            Login
-          </Link>
-        </li>
-        <li>
-          <Link href="/" className="text-black hover:text-blue-600">
-            Sign in
-          </Link>
-        </li>
-        <li>
-          <Link href="/SigninRequest" className="text-black hover:text-blue-600">
-            Collaborate With Us
-          </Link>
-        </li>
-        <li>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
+          {/* Link per desktop */}
+          <ul className="hidden md:flex space-x-6">
+            <li>
+              <Link href="/" className="text-black hover:text-blue-600">
+                Login
+              </Link>
+            </li>
+            <li>
+              <Link href="/signin" className="text-black hover:text-blue-600">
+                Sign in
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/SigninRequest"
+                className="text-black hover:text-blue-600"
+              >
+                Collaborate With Us
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/HomeAmministratore"
+                className="text-black hover:text-blue-600"
+              >
+                A
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/HomeGestore"
+                className="text-black hover:text-blue-600"
+              >
+                G
+              </Link>
+            </li>
+          </ul>
 
-  )
+          {/* Menu hamburger per mobile */}
+          <button
+            className="md:hidden text-black hover:text-blue-600 focus:outline-none"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? <HiOutlineX size={28} /> : <HiOutlineMenu size={28} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Drawer menu mobile */}
+      {menuOpen && (
+        <div className="md:hidden bg-white border-t border-black shadow-md">
+          <ul className="flex flex-col space-y-2 px-4 py-4">
+            <li>
+              <Link
+                href="/"
+                className="block text-black hover:text-blue-600"
+                onClick={() => setMenuOpen(false)}
+              >
+                Login
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/signin"
+                className="block text-black hover:text-blue-600"
+                onClick={() => setMenuOpen(false)}
+              >
+                Sign in
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/SigninRequest"
+                className="block text-black hover:text-blue-600"
+                onClick={() => setMenuOpen(false)}
+              >
+                Collaborate With Us
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/HomeAmministratore"
+                className="block text-black hover:text-blue-600"
+                onClick={() => setMenuOpen(false)}
+              >
+                Accedi in amministratore(momentaneo)
+              </Link>
+            </li>
+          </ul>
+        </div>
+      )}
+    </nav>
+  );
 }

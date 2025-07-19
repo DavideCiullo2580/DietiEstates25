@@ -72,7 +72,7 @@ export default function SignUpForm() {
               {/* Bottone Registrati */}
               <button
                 type="submit"
-                className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold shadow transition duration-200"
+                className="w-full py-3 bg-gray-300 hover:bg-gray-400 active:bg-gray-500 text-black font-semibold shadow rounded-md transition duration-200"
               >
                 Registrati
               </button>
@@ -95,7 +95,7 @@ export default function SignUpForm() {
 
             <p className="mt-6 text-center text-sm">
               Hai già un account?{' '}
-              <Link href="" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link href="/" className="text-blue-600 hover:underline font-medium">
                 Accedi qui
               </Link>
             </p>
