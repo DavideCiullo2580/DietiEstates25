@@ -3,11 +3,12 @@ import React from "react";
 import NavbarGestore from "../Components/NavbarGestore";
 import ImmobiliPage from "../Components/ImmobiliPage";
 import Footer from "../Components/Footer";
+import NavbarAgenteImmobiliare from "../Components/NavbarAgenteImmobiliare";
 
-export default function HomeAmministratore() {
+export default function HomeAgenteImmobiliare() {
   return (
     <> 
-       <NavbarGestore />
+       <NavbarAgenteImmobiliare />
        <ImmobiliPage/>
        <Footer />
     </>

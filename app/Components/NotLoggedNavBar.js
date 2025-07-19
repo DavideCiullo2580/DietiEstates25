@@ -26,18 +26,18 @@ export default function NotLoggedNavBar() {
           {/* Link per desktop */}
           <ul className="hidden md:flex space-x-6">
             <li>
-              <Link href="/" className="text-black hover:text-blue-600">
-                Login
-              </Link>
+          <Link href="/#login" scroll={true} className="text-black hover:text-blue-600">
+            Accedi
+          </Link>
             </li>
             <li>
-              <Link href="/signin" className="text-black hover:text-blue-600">
+              <Link href="/signin#registrazione" scroll={true} className="text-black hover:text-blue-600">
                 Sign in
               </Link>
             </li>
             <li>
               <Link
-                href="/SigninRequest"
+                href="/SigninRequest#registrazione_azienda" scroll={true} 
                 className="text-black hover:text-blue-600"
               >
                 Collaborate With Us
@@ -59,6 +59,14 @@ export default function NotLoggedNavBar() {
                 G
               </Link>
             </li>
+            <li>
+              <Link
+                href="/HomeAgenteImmobiliare"
+                className="text-black hover:text-blue-600"
+              >
+                Agente
+              </Link>
+            </li>
           </ul>
 
           {/* Menu hamburger per mobile */}
@@ -78,7 +86,7 @@ export default function NotLoggedNavBar() {
           <ul className="flex flex-col space-y-2 px-4 py-4">
             <li>
               <Link
-                href="/"
+                href="/#accedi"
                 className="block text-black hover:text-blue-600"
                 onClick={() => setMenuOpen(false)}
               >
@@ -87,7 +95,7 @@ export default function NotLoggedNavBar() {
             </li>
             <li>
               <Link
-                href="/signin"
+                href="/signin#registrazione"
                 className="block text-black hover:text-blue-600"
                 onClick={() => setMenuOpen(false)}
               >
@@ -96,7 +104,7 @@ export default function NotLoggedNavBar() {
             </li>
             <li>
               <Link
-                href="/SigninRequest"
+                href="/SigninRequest#registrazione_azienda"
                 className="block text-black hover:text-blue-600"
                 onClick={() => setMenuOpen(false)}
               >

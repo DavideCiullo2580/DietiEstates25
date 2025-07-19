@@ -7,20 +7,20 @@ export default function Login() {
       <section className="min-h-screen grid grid-cols-1 md:grid-cols-2">
         {/* Colonna sinistra con sfondo e testo */}
         <div
-          className="relative flex items-center justify-center bg-cover bg-center bg-no-repeat px-8 py-16"
-          style={{ backgroundImage: 'url("/homepage-background.png")' }}
+          id="registrazione_azienda" className="relative flex items-center justify-center bg-cover bg-center bg-no-repeat px-8 py-16"
+          style={{ backgroundImage: 'url("/immagine-candidatura.jpg")' }}
         >
-          <div className="absolute inset-0 bg-black opacity-50 z-0"></div>
+          <div className="absolute inset-0 bg-gray-800 opacity-50 z-0"></div>
 
           <div className="relative z-10 max-w-md text-center text-white space-y-6">
             <h1 className="text-4xl font-bold leading-tight">
-              Trova la casa dei tuoi sogni
+              Dai forma al futuro dell'immobiliare con noi.
             </h1>
             <p className="text-lg">
-              Su <span className="font-semibold text-blue-300">DietiEstates25</span> selezioniamo solo immobili di qualità, per offrirti un’esperienza abitativa unica.
+              Su <span className="font-semibold text-blue-300">DietiEstates25</span> cerchiamo professionisti ambiziosi e affidabili per espandere la nostra rete. Unisciti a un team dinamico e innovativo, dove la tua passione per l'immobiliare trova nuove opportunità.
             </p>
             <p className="text-md text-blue-200">
-              Scopri un nuovo modo di cercare casa: semplice, affidabile, trasparente.
+              Costruiamo insieme un servizio di eccellenza: trasparente, efficiente e orientato al successo reciproco.
             </p>
           </div>
         </div>

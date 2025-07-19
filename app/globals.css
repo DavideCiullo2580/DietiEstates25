@@ -11,6 +11,10 @@ html, body {
   @apply min-h-screen bg-zinc-100 text-zinc-900 antialiased;
 }
 
+html {
+  @apply scroll-smooth;
+}
+
 /* DARK MODE AUTO */
 @media (prefers-color-scheme: dark) {
   html, body {

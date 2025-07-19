@@ -1,14 +1,14 @@
 "use client";
 import React from "react";
 import NavbarAmministratore from "../Components/NavbarAmministratore";
-import ImmobiliPageAmministratore from "../Components/ImmobiliPageAmministratore";
+import ImmobiliPage from "../Components/ImmobiliPage";
 import Footer from "../Components/Footer";
 
 export default function HomeAmministratore() {
   return (
     <> 
        <NavbarAmministratore />
-       <ImmobiliPageAmministratore />
+       <ImmobiliPage />
        <Footer />
     </>
   );

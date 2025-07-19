@@ -30,7 +30,8 @@ export default function Login() {
         </div>
 
         {/* Colonna destra: login */}
-        <div className="flex flex-col items-center justify-center px-6 py-16 bg-white shadow-xl">
+        <div id="login" className="flex flex-col items-center justify-center px-6 py-16 bg-white shadow-xl">
+
           <div className="w-full max-w-md">
             <h2 className="text-3xl font-bold text-black mb-8 text-center">Accedi</h2>
 
