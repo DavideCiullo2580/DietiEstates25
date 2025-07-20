@@ -72,7 +72,7 @@ export default function Login() {
             {/* Testo sotto il form */}
             <p className="mt-6 text-center text-sm text-gray-600">
               Non hai un account?{' '}
-              <Link href="/signin" className="text-blue-600 hover:underline font-medium">
+              <Link href="/signin#registrazione" className="text-blue-600 hover:underline font-medium">
                 Registrati
               </Link>
             </p>

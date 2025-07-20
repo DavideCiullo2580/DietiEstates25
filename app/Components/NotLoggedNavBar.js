@@ -67,6 +67,14 @@ export default function NotLoggedNavBar() {
                 Agente
               </Link>
             </li>
+            <li>
+              <Link
+                href="/HomeUtente"
+                className="text-black hover:text-blue-600"
+              >
+                Utente
+              </Link>
+            </li>
           </ul>
 
           {/* Menu hamburger per mobile */}

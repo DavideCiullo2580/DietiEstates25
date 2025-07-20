@@ -96,7 +96,7 @@ export default function SignUpForm() {
 
             <p className="mt-6 text-center text-sm">
               Hai già un account?{' '}
-              <Link href="/" className="text-blue-600 hover:underline font-medium">
+              <Link href="/#login" className="text-blue-600 hover:underline font-medium">
                 Accedi qui
               </Link>
             </p>
