@@ -29,10 +29,9 @@ router.post("/login", async (req, res) => {
 
     const token = jwt.sign({ userId: user.username }, JWT_SECRET, { expiresIn: '1h' });
 
-    // Restituisci anche il ruolo
     res.json({
       token,
-      role: user.ruolo  // <-- campo usato nel frontend per il redirect
+      role: user.ruolo  
     });
 
   } catch (err) {
@@ -40,7 +39,6 @@ router.post("/login", async (req, res) => {
     res.sendStatus(500);
   }
 });
-
 
 //Sign in--------------------------------------------------------------------------------------------------------------------
 
@@ -52,16 +50,13 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: "Missing username, email or password" });
     }
 
-    // Controlla se username già esiste
     const userExist = await pool.query("SELECT username FROM users WHERE username = $1", [username]);
     if (userExist.rows.length > 0) {
       return res.status(409).json({ error: "Username già esistente" });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Inserisci utente con ruolo 'utente' e telefono NULL
     await pool.query(
       "INSERT INTO users (username, password, email, telefono, ruolo) VALUES ($1, $2, $3, $4, $5)",
       [username, hashedPassword, email, null, 'utente']
@@ -81,13 +76,11 @@ router.post("/register-agency", async (req, res) => {
     const { societa, pec, telefono } = req.body;
 
     if (!societa || !pec || !telefono) {
-      console.log("Dati mancanti nella richiesta");
       return res.status(400).json({ error: "Dati mancanti" });
     }
 
     const exist = await pool.query("SELECT username FROM users WHERE username = $1", [societa]);
     if (exist.rows.length > 0) {
-      console.log(`Società ${societa} già registrata`);
       return res.status(409).json({ error: "Società già registrata" });
     }
 
@@ -95,10 +88,11 @@ router.post("/register-agency", async (req, res) => {
     const hashedPassword = await bcrypt.hash(generatedPassword, 10);
 
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: "sandbox.smtp.mailtrap.io",
+      port: 2525,
       auth: {
-        user: 'davideciullo2@gmail.com',
-        pass: 'progetto' // usa app password
+        user: "5fec793739f924",
+        pass: "15eb9f39286b92"
       }
     });
 
@@ -112,29 +106,27 @@ router.post("/register-agency", async (req, res) => {
     let mailSent = false;
     try {
       const info = await transporter.sendMail(mailOptions);
-      console.log("Info invio mail:", info);
       if (info.accepted && info.accepted.length > 0) {
         mailSent = true;
-        console.log("Mail inviata correttamente");
-      } else {
-        console.log("Mail non accettata da destinatario");
+        console.log("Mail inviata correttamente:", info);
       }
     } catch (mailErr) {
       console.error("Errore nell'invio mail:", mailErr);
     }
 
     if (!mailSent) {
-      console.log("Mail NON inviata, blocco inserimento dati");
+
       return res.status(500).json({ error: "Invio email fallito, registrazione annullata" });
-    } else {
-      console.log("Mail inviata, inserisco dati nel DB");
-      await pool.query(
-        "INSERT INTO users (username, password, email, telefono, ruolo) VALUES ($1, $2, $3, $4, $5)",
-        [societa, hashedPassword, pec, telefono, 'amministratore']
-      );
-      console.log("Dati inseriti con successo");
-      return res.status(201).json({ message: "Azienda registrata con successo. Controlla l'email per la password." });
     }
+
+   await pool.query(
+  `INSERT INTO public.users (username, password, email, telefono, ruolo, azienda) 
+   VALUES ($1, $2, $3, $4, $5, $6)`,
+  [societa, hashedPassword, pec, telefono, 'amministratore', societa]
+);
+
+
+    return res.status(201).json({ message: "Azienda registrata con successo. Controlla l'email per la password." });
 
   } catch (err) {
     console.error("Errore in /register-agency:", err);
@@ -143,6 +135,54 @@ router.post("/register-agency", async (req, res) => {
 });
 
 
+//cambio password amministratore-----------------------------------------------------------------------------------------------
+
+router.post("/change-password", authenticateToken, async (req, res) => {
+  try {
+    const { vecchiaPassword, nuovaPassword } = req.body;
+    const username = req.user.userId; 
+
+    if (!vecchiaPassword || !nuovaPassword) {
+      return res.status(400).json({ error: "Vecchia o nuova password mancante" });
+    }
+
+    const userResult = await pool.query("SELECT password FROM users WHERE username = $1", [username]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: "Utente non trovato" });
+    }
+
+    const user = userResult.rows[0];
+
+    const match = await bcrypt.compare(vecchiaPassword, user.password);
+    if (!match) {
+      return res.status(401).json({ error: "Vecchia password errata" });
+    }
+
+    const hashedNewPassword = await bcrypt.hash(nuovaPassword, 10);
+
+    await pool.query("UPDATE users SET password = $1 WHERE username = $2", [hashedNewPassword, username]);
+
+    res.json({ message: "Password aggiornata con successo" });
+  } catch (err) {
+    console.error("Errore in /change-password:", err);
+    res.status(500).json({ error: "Errore server interno" });
+  }
+});
+
+//rotta per prendere il nome dell azienda dal token------------------------------------------------------------------------
+
+router.get('/NomeAzienda', authenticateToken, async (req, res) => {
+  try {
+    const username = req.user.userId; // qui userId è lo username salvato nel token
+    const result = await pool.query('SELECT azienda FROM users WHERE username = $1', [username]);
+    if (result.rows.length === 0) return res.status(404).json({ error: "Utente non trovato" });
+    return res.json({ azienda: result.rows[0].azienda });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Errore server" });
+  }
+});
 
 
 

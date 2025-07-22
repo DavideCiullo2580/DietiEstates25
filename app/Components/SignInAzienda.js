@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+  const router = useRouter();
+
   const [societa, setSocieta] = useState("");
   const [pec, setPec] = useState("");
   const [telefono, setTelefono] = useState("");
@@ -26,6 +29,11 @@ export default function Login() {
         setSocieta("");
         setPec("");
         setTelefono("");
+
+        // Reindirizzamento alla home dopo 1.5 secondi
+        setTimeout(() => {
+          router.push("/");
+        }, 1500);
       } else {
         setErrorMessage(data.error || "Errore durante la registrazione.");
       }
