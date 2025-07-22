@@ -1,15 +1,67 @@
-"use client";
-
-import Link from 'next/link';
+'use client';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
+  const router = useRouter();
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => { 
+    e.preventDefault();
+    setError(null);
+    try {
+      const res = await fetch('http://localhost:8080/posts/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Errore durante il login');
+        return;
+      }
+
+      // Salvo il token (ad esempio in localStorage)
+      localStorage.setItem('token', data.token);
+
+      // Recupero il ruolo dal backend (deve essere inviato nella risposta)
+      const ruolo = data.role;
+
+      // Redirect in base al ruolo
+      switch (ruolo) {
+        case 'utente':
+          router.push('/HomeUtente');
+          break;
+        case 'amministratore':
+          router.push('/HomeAmministratore');
+          break;
+        case 'gestore':
+          router.push('/HomeGestore');
+          break;
+        case 'agente_immobiliare':
+          router.push('/HomeAgenteImmobiliare');
+          break;
+        default:
+          // Se ruolo sconosciuto, redirect a homepage o pagina di default
+          router.push('/');
+          break;
+      }
+
+    } catch (error) {
+      setError('Errore di rete o server');
+    }
+  };
+
   return (
     <>
-      {/* Linea nera sopra il componente */}
       <div className="w-full border-t border-black" />
 
       <section className="min-h-screen grid grid-cols-1 md:grid-cols-2">
-        {/* Colonna sinistra con sfondo e testo */}
         <div
           className="relative flex items-center justify-center bg-cover bg-center bg-no-repeat px-8 py-16"
           style={{ backgroundImage: 'url("/immagine-accedi.jpg")' }}
@@ -29,38 +81,50 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Colonna destra: login */}
-        <div id="login" className="flex flex-col items-center justify-center px-6 py-16 bg-white shadow-xl">
-
+        <div
+          id="login"
+          className="flex flex-col items-center justify-center px-6 py-16 bg-white shadow-xl"
+        >
           <div className="w-full max-w-md">
             <h2 className="text-3xl font-bold text-black mb-8 text-center">Accedi</h2>
 
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
-                <label htmlFor="login-username" className="block text-sm font-medium text-black mb-1">
+                <label
+                  htmlFor="login-username"
+                  className="block text-sm font-medium text-black mb-1"
+                >
                   Username o Nome dell'agenzia
                 </label>
                 <input
                   type="text"
                   id="login-username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="block w-full px-4 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-black"
                   placeholder="Inserisci il tuo username"
+                  required
                 />
               </div>
 
               <div>
-                <label htmlFor="login-password" className="block text-sm font-medium text-black mb-1">
+                <label
+                  htmlFor="login-password"
+                  className="block text-sm font-medium text-black mb-1"
+                >
                   Password
                 </label>
                 <input
                   type="password"
                   id="login-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="block w-full px-4 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-black"
                   placeholder="Inserisci la tua password"
+                  required
                 />
               </div>
 
-              {/* Bottone aggiornato */}
               <button
                 type="submit"
                 className="w-full py-3 bg-gray-200 hover:bg-gray-300 text-black font-semibold shadow transition duration-200"
@@ -69,12 +133,18 @@ export default function Login() {
               </button>
             </form>
 
-            {/* Testo sotto il form */}
+            {error && (
+              <p className="mt-4 text-center text-sm text-red-600">{error}</p>
+            )}
+
             <p className="mt-6 text-center text-sm text-gray-600">
               Non hai un account?{' '}
-              <Link href="/signin#registrazione" className="text-blue-600 hover:underline font-medium">
+              <a
+                href="/signin#registrazione"
+                className="text-blue-600 hover:underline font-medium"
+              >
                 Registrati
-              </Link>
+              </a>
             </p>
           </div>
         </div>
