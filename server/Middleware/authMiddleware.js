@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = 'Token';
+const JWT_SECRET = 'Token'; 
 
 function authenticateToken(req, res, next) {
-  const token = req.headers['authorization'];
+  const authHeader = req.headers['authorization'];
+  s
+  const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) return res.sendStatus(401);
 
