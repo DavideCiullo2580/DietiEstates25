@@ -184,6 +184,4 @@ router.get('/NomeAzienda', authenticateToken, async (req, res) => {
   }
 });
 
-
-
 module.exports = router;

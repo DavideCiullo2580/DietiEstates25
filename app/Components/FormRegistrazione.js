@@ -148,22 +148,26 @@ export default function SignUpForm() {
               Oppure registrati con:
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="flex-1 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow hover:bg-gray-200">
+             <button
+                onClick={() => window.location.href = "/api/auth/signin/google"}
+                className="flex-1 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow hover:bg-gray-200">
                 Google
               </button>
+
               <button className="flex-1 px-4 py-2 bg-blue-800 text-white rounded-md shadow hover:bg-blue-900">
                 Facebook
               </button>
-              <button className="flex-1 px-4 py-2 bg-gray-800 text-white rounded-md shadow hover:bg-gray-900">
-                GitHub
-              </button>
+              <button onClick={() => window.location.href = "/api/auth/signin/github"}
+                className="flex-1 px-4 py-2 bg-gray-800 text-white rounded-md shadow hover:bg-gray-900">
+              GitHub
+            </button>
             </div>
           </div>
 
           <p className="mt-6 text-center text-sm">
             Hai già un account?{" "}
             <Link
-              href="/#login"
+              href="/"
               className="text-blue-600 hover:underline font-medium"
             >
               Accedi qui

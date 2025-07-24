@@ -26,18 +26,18 @@ export default function NotLoggedNavBar() {
           {/* Link per desktop */}
           <ul className="hidden md:flex space-x-6">
             <li>
-          <Link href="/#login" scroll={true} className="text-black hover:text-blue-600">
+          <Link href="/" scroll={true} className="text-black hover:text-blue-600">
             Accedi
           </Link>
             </li>
             <li>
-              <Link href="/signin#registrazione" scroll={true} className="text-black hover:text-blue-600">
+              <Link href="/signin" scroll={true} className="text-black hover:text-blue-600">
                 Sign in
               </Link>
             </li>
             <li>
               <Link
-                href="/SigninRequest#registrazione_azienda" scroll={true} 
+                href="/SigninRequest" scroll={true} 
                 className="text-black hover:text-blue-600"
               >
                 Collaborate With Us
