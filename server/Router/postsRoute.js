@@ -41,7 +41,6 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
 // REGISTER UTENTE
 router.post("/register", async (req, res) => {
   try {
@@ -89,10 +88,11 @@ router.post("/register-agency", async (req, res) => {
     const hashedPassword = await bcrypt.hash(generatedPassword, 10);
 
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: "sandbox.smtp.mailtrap.io",
+      port: 2525,
       auth: {
         user: 'davideciullo2@gmail.com',
-        pass: 'progetto' // Usa app password
+        pass: 'progetto' // usa app password
       }
     });
 
@@ -103,18 +103,32 @@ router.post("/register-agency", async (req, res) => {
       text: `Grazie per esserti registrato.\nLe tue credenziali:\nUsername: ${societa}\nPassword: ${generatedPassword}`
     };
 
-    const info = await transporter.sendMail(mailOptions);
-
-    if (!info.accepted || info.accepted.length === 0) {
-      return res.status(500).json({ error: "Invio email fallito, registrazione annullata" });
+    let mailSent = false;
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log("Info invio mail:", info);
+      if (info.accepted && info.accepted.length > 0) {
+        mailSent = true;
+        console.log("Mail inviata correttamente");
+      } else {
+        console.log("Mail non accettata da destinatario");
+      }
+    } catch (mailErr) {
+      console.error("Errore nell'invio mail:", mailErr);
     }
 
-    await pool.query(
-      "INSERT INTO users (username, password, email, telefono, ruolo) VALUES ($1, $2, $3, $4, $5)",
-      [societa, hashedPassword, pec, telefono, 'amministratore']
-    );
-
-    res.status(201).json({ message: "Azienda registrata con successo. Controlla l'email per la password." });
+    if (!mailSent) {
+      console.log("Mail NON inviata, blocco inserimento dati");
+      return res.status(500).json({ error: "Invio email fallito, registrazione annullata" });
+    } else {
+      console.log("Mail inviata, inserisco dati nel DB");
+      await pool.query(
+        "INSERT INTO users (username, password, email, telefono, ruolo) VALUES ($1, $2, $3, $4, $5)",
+        [societa, hashedPassword, pec, telefono, 'amministratore']
+      );
+      console.log("Dati inseriti con successo");
+      return res.status(201).json({ message: "Azienda registrata con successo. Controlla l'email per la password." });
+    }
 
   } catch (err) {
     console.error("Errore in /register-agency:", err);
@@ -161,73 +175,7 @@ router.post("/add-agent", async (req, res) => {
 });
 
 
-// AGGIUNGI IMMOBILE
-router.post("/immobili", authenticateToken, upload.array('immagini'), async (req, res) => {
-  try {
-    const {
-      tipoAnnuncio,
-      tipoImmobile,
-      prezzo,
-      dimensioni,
-      stanze,
-      piano,
-      indirizzo,
-      classeEnergetica,
-      descrizione,
-      servizi
-    } = req.body;
 
-    if (!tipoAnnuncio || !tipoImmobile || !prezzo) {
-      return res.status(400).json({ error: "Tutti i campi obbligatori sono obbligatori" });
-    }
 
-    let serviziArray;
-    try {
-      serviziArray = JSON.parse(servizi);
-      if (!Array.isArray(serviziArray)) throw new Error("Non è un array");
-    } catch (err) {
-      return res.status(400).json({ error: "Formato servizi non valido" });
-    }
-
-    // Prendi username dal token (che ora è salvato in req.user.username)
-    const agenteUsername = req.user.username;
-
-    // Inserisci immobile con agente_id = username dell'agente
-    const result = await pool.query(
-      `INSERT INTO immobili (tipo_annuncio, tipo_immobile, prezzo, dimensioni, stanze, piano, indirizzo, classe_energetica, descrizione, servizi, agente_id) 
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
-      [
-        tipoAnnuncio,
-        tipoImmobile,
-        prezzo,
-        dimensioni,
-        stanze,
-        piano,
-        indirizzo,
-        classeEnergetica,
-        descrizione,
-        JSON.stringify(serviziArray),
-        agenteUsername
-      ]
-    );
-
-    const immobileId = result.rows[0].id;
-
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        await pool.query(
-          `INSERT INTO immagini_immobile (immobile_id, path) VALUES ($1, $2)`,
-          [immobileId, file.filename]
-        );
-      }
-    }
-
-    res.status(201).json({ message: "Immobile aggiunto con successo", immobileId });
-
-  } catch (err) {
-    console.error("Errore in /immobili POST:", err);
-    res.status(500).json({ error: "Errore server interno" });
-  }
-});
 
 module.exports = router;

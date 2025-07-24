@@ -45,22 +45,6 @@ export default function NotLoggedNavBar() {
             </li>
             <li>
               <Link
-                href="/HomeAmministratore"
-                className="text-black hover:text-blue-600"
-              >
-                A
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/HomeGestore"
-                className="text-black hover:text-blue-600"
-              >
-                G
-              </Link>
-            </li>
-            <li>
-              <Link
                 href="/HomeAgenteImmobiliare"
                 className="text-black hover:text-blue-600"
               >
