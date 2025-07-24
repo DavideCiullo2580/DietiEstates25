@@ -26,13 +26,10 @@ export default function Login() {
         return;
       }
 
-      // Salvo il token (ad esempio in localStorage)
       localStorage.setItem('token', data.token);
 
-      // Recupero il ruolo dal backend (deve essere inviato nella risposta)
       const ruolo = data.role;
 
-      // Redirect in base al ruolo
       switch (ruolo) {
         case 'utente':
           router.push('/HomeUtente');
@@ -47,6 +44,10 @@ export default function Login() {
           router.push('/HomeAgenteImmobiliare');
           break;
         default:
+<<<<<<< HEAD
+=======
+          
+>>>>>>> 7e81a3409bf699498340dbc459b37bda048da0fa
           router.push('/');
           break;
       }

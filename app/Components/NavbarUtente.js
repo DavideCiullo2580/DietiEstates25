@@ -35,6 +35,13 @@ export default function NavbarUtente() {
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-300 shadow-lg rounded-md py-2 z-50">
                 <Link
+                  href="/CambiaPasswordAmministratore"
+                  className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Cambia password
+                </Link>
+                <Link
                   href="/"
                   className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
                   onClick={() => setMenuOpen(false)}
