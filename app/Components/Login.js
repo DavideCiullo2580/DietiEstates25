@@ -43,14 +43,14 @@ export default function Login() {
         case 'gestore':
           router.push('/HomeGestore');
           break;
-        case 'agente_immobiliare':
+        case 'agente': // qui cambio da 'agente_immobiliare' a 'agente'
           router.push('/HomeAgenteImmobiliare');
           break;
         default:
-          // Se ruolo sconosciuto, redirect a homepage o pagina di default
           router.push('/');
           break;
       }
+
 
     } catch (error) {
       setError('Errore di rete o server');

@@ -5,17 +5,17 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require("nodemailer");
 const authenticateToken = require('../Middleware/authMiddleware');
+const upload = require("../Middleware/uploadMiddleware");
 
 const JWT_SECRET = 'Token';
 
-// Login ----------------------------------------------------------------------------------------------------
 
+// LOGIN
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
 
     const userResult = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
-
     if (userResult.rows.length === 0) {
       return res.status(401).json({ error: "Credenziali non valide" });
     }
@@ -27,12 +27,12 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Credenziali non valide" });
     }
 
-    const token = jwt.sign({ userId: user.username }, JWT_SECRET, { expiresIn: '1h' });
+    // Inseriamo direttamente lo username nel token
+    const token = jwt.sign({ username: user.username }, JWT_SECRET, { expiresIn: '1h' });
 
-    // Restituisci anche il ruolo
     res.json({
       token,
-      role: user.ruolo  // <-- campo usato nel frontend per il redirect
+      role: user.ruolo  
     });
 
   } catch (err) {
@@ -42,8 +42,7 @@ router.post("/login", async (req, res) => {
 });
 
 
-//Sign in--------------------------------------------------------------------------------------------------------------------
-
+// REGISTER UTENTE
 router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -52,16 +51,13 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: "Missing username, email or password" });
     }
 
-    // Controlla se username già esiste
     const userExist = await pool.query("SELECT username FROM users WHERE username = $1", [username]);
     if (userExist.rows.length > 0) {
       return res.status(409).json({ error: "Username già esistente" });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Inserisci utente con ruolo 'utente' e telefono NULL
     await pool.query(
       "INSERT INTO users (username, password, email, telefono, ruolo) VALUES ($1, $2, $3, $4, $5)",
       [username, hashedPassword, email, null, 'utente']
@@ -74,20 +70,18 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Register agenzia/azienda ----------------------------------------------------------------------------------
 
+// REGISTER AGENZIA
 router.post("/register-agency", async (req, res) => {
   try {
     const { societa, pec, telefono } = req.body;
 
     if (!societa || !pec || !telefono) {
-      console.log("Dati mancanti nella richiesta");
       return res.status(400).json({ error: "Dati mancanti" });
     }
 
     const exist = await pool.query("SELECT username FROM users WHERE username = $1", [societa]);
     if (exist.rows.length > 0) {
-      console.log(`Società ${societa} già registrata`);
       return res.status(409).json({ error: "Società già registrata" });
     }
 
@@ -98,7 +92,7 @@ router.post("/register-agency", async (req, res) => {
       service: 'gmail',
       auth: {
         user: 'davideciullo2@gmail.com',
-        pass: 'progetto' // usa app password
+        pass: 'progetto' // Usa app password
       }
     });
 
@@ -109,41 +103,131 @@ router.post("/register-agency", async (req, res) => {
       text: `Grazie per esserti registrato.\nLe tue credenziali:\nUsername: ${societa}\nPassword: ${generatedPassword}`
     };
 
-    let mailSent = false;
-    try {
-      const info = await transporter.sendMail(mailOptions);
-      console.log("Info invio mail:", info);
-      if (info.accepted && info.accepted.length > 0) {
-        mailSent = true;
-        console.log("Mail inviata correttamente");
-      } else {
-        console.log("Mail non accettata da destinatario");
-      }
-    } catch (mailErr) {
-      console.error("Errore nell'invio mail:", mailErr);
+    const info = await transporter.sendMail(mailOptions);
+
+    if (!info.accepted || info.accepted.length === 0) {
+      return res.status(500).json({ error: "Invio email fallito, registrazione annullata" });
     }
 
-    if (!mailSent) {
-      console.log("Mail NON inviata, blocco inserimento dati");
-      return res.status(500).json({ error: "Invio email fallito, registrazione annullata" });
-    } else {
-      console.log("Mail inviata, inserisco dati nel DB");
-      await pool.query(
-        "INSERT INTO users (username, password, email, telefono, ruolo) VALUES ($1, $2, $3, $4, $5)",
-        [societa, hashedPassword, pec, telefono, 'amministratore']
-      );
-      console.log("Dati inseriti con successo");
-      return res.status(201).json({ message: "Azienda registrata con successo. Controlla l'email per la password." });
-    }
+    await pool.query(
+      "INSERT INTO users (username, password, email, telefono, ruolo) VALUES ($1, $2, $3, $4, $5)",
+      [societa, hashedPassword, pec, telefono, 'amministratore']
+    );
+
+    res.status(201).json({ message: "Azienda registrata con successo. Controlla l'email per la password." });
 
   } catch (err) {
     console.error("Errore in /register-agency:", err);
-    return res.status(500).json({ error: "Errore server interno" });
+    res.status(500).json({ error: "Errore server interno" });
   }
 });
 
 
+// AGGIUNGI AGENTE
+router.post("/add-agent", async (req, res) => {
+  try {
+    const { nome, email, password, confermaPassword } = req.body;
+
+    if (!nome || !email || !password || !confermaPassword) {
+      return res.status(400).json({ error: "Tutti i campi sono obbligatori" });
+    }
+
+    if (password !== confermaPassword) {
+      return res.status(400).json({ error: "Le password non corrispondono" });
+    }
+
+    const baseUsername = nome.toLowerCase().replace(/\s+/g, '');
+    let finalUsername = baseUsername + Math.floor(Math.random() * 1000);
+
+    let userExist = await pool.query("SELECT username FROM users WHERE username = $1", [finalUsername]);
+    while (userExist.rows.length > 0) {
+      finalUsername = baseUsername + Math.floor(Math.random() * 1000);
+      userExist = await pool.query("SELECT username FROM users WHERE username = $1", [finalUsername]);
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await pool.query(
+      "INSERT INTO users (username, password, email, telefono, ruolo) VALUES ($1, $2, $3, $4, $5)",
+      [finalUsername, hashedPassword, email, null, "agente"]
+    );
+
+    res.status(201).json({ message: `Agente ${finalUsername} registrato con successo.` });
+
+  } catch (err) {
+    console.error("Errore in /add-agent:", err);
+    res.status(500).json({ error: "Errore server interno" });
+  }
+});
 
 
+// AGGIUNGI IMMOBILE
+router.post("/immobili", authenticateToken, upload.array('immagini'), async (req, res) => {
+  try {
+    const {
+      tipoAnnuncio,
+      tipoImmobile,
+      prezzo,
+      dimensioni,
+      stanze,
+      piano,
+      indirizzo,
+      classeEnergetica,
+      descrizione,
+      servizi
+    } = req.body;
+
+    if (!tipoAnnuncio || !tipoImmobile || !prezzo) {
+      return res.status(400).json({ error: "Tutti i campi obbligatori sono obbligatori" });
+    }
+
+    let serviziArray;
+    try {
+      serviziArray = JSON.parse(servizi);
+      if (!Array.isArray(serviziArray)) throw new Error("Non è un array");
+    } catch (err) {
+      return res.status(400).json({ error: "Formato servizi non valido" });
+    }
+
+    // Prendi username dal token (che ora è salvato in req.user.username)
+    const agenteUsername = req.user.username;
+
+    // Inserisci immobile con agente_id = username dell'agente
+    const result = await pool.query(
+      `INSERT INTO immobili (tipo_annuncio, tipo_immobile, prezzo, dimensioni, stanze, piano, indirizzo, classe_energetica, descrizione, servizi, agente_id) 
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
+      [
+        tipoAnnuncio,
+        tipoImmobile,
+        prezzo,
+        dimensioni,
+        stanze,
+        piano,
+        indirizzo,
+        classeEnergetica,
+        descrizione,
+        JSON.stringify(serviziArray),
+        agenteUsername
+      ]
+    );
+
+    const immobileId = result.rows[0].id;
+
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        await pool.query(
+          `INSERT INTO immagini_immobile (immobile_id, path) VALUES ($1, $2)`,
+          [immobileId, file.filename]
+        );
+      }
+    }
+
+    res.status(201).json({ message: "Immobile aggiunto con successo", immobileId });
+
+  } catch (err) {
+    console.error("Errore in /immobili POST:", err);
+    res.status(500).json({ error: "Errore server interno" });
+  }
+});
 
 module.exports = router;
