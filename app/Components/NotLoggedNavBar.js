@@ -43,25 +43,8 @@ export default function NotLoggedNavBar() {
                 Collaborate With Us
               </Link>
             </li>
-            <li>
-              <Link
-                href="/HomeAgenteImmobiliare"
-                className="text-black hover:text-blue-600"
-              >
-                Agente
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/HomeUtente"
-                className="text-black hover:text-blue-600"
-              >
-                Utente
-              </Link>
-            </li>
           </ul>
 
-          {/* Menu hamburger per mobile */}
           <button
             className="md:hidden text-black hover:text-blue-600 focus:outline-none"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -72,7 +55,6 @@ export default function NotLoggedNavBar() {
         </div>
       </div>
 
-      {/* Drawer menu mobile */}
       {menuOpen && (
         <div className="md:hidden bg-white border-t border-black shadow-md">
           <ul className="flex flex-col space-y-2 px-4 py-4">
@@ -101,15 +83,6 @@ export default function NotLoggedNavBar() {
                 onClick={() => setMenuOpen(false)}
               >
                 Collaborate With Us
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/HomeAmministratore"
-                className="block text-black hover:text-blue-600"
-                onClick={() => setMenuOpen(false)}
-              >
-                Accedi in amministratore(momentaneo)
               </Link>
             </li>
           </ul>

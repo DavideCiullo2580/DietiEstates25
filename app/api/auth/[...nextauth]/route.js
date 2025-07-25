@@ -41,7 +41,7 @@ async function saveUserToDB(user) {
     from: "dietiestates25@noreply.com",
     to: email,
     subject: "Benvenuto su DietiEstates25",
-    text: `Ciao ${name}(questo è il tuo username),\n\nGrazie per esserti registrato con Google.\nEcco la tua password temporanea per eventuali accessi manuali:\n\n${generatedPassword}\n\nTi consigliamo di cambiarla al primo accesso.\n\nLo staff di DietiEstates25.`,
+    text: `Ciao ${name}(questo è il tuo username),\n\nGrazie per esserti registrato.\nEcco la tua password temporanea per eventuali accessi manuali:\n\n${generatedPassword}\n\nTi consigliamo di cambiarla al primo accesso.\n\nLo staff di DietiEstates25.`,
   };
 
   try {

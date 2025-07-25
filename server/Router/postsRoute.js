@@ -27,7 +27,6 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Credenziali non valide" });
     }
 
-    // Inseriamo direttamente lo username nel token
     const token = jwt.sign({ username: user.username }, JWT_SECRET, { expiresIn: '1h' });
 
     res.json({
@@ -41,8 +40,8 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
 // REGISTER UTENTE----------------------------------------------------------------------------------------------------------------
+
 router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -70,18 +69,20 @@ router.post("/register", async (req, res) => {
   }
 });
 
-
 // REGISTER AGENZIA----------------------------------------------------------------------------------------------------------------
+
 router.post("/register-agency", async (req, res) => {
   try {
     const { societa, pec, telefono } = req.body;
 
     if (!societa || !pec || !telefono) {
+      console.log("Dati mancanti nella richiesta");
       return res.status(400).json({ error: "Dati mancanti" });
     }
 
     const exist = await pool.query("SELECT username FROM users WHERE username = $1", [societa]);
     if (exist.rows.length > 0) {
+      console.log(`Società ${societa} già registrata`);
       return res.status(409).json({ error: "Società già registrata" });
     }
 
@@ -89,44 +90,115 @@ router.post("/register-agency", async (req, res) => {
     const hashedPassword = await bcrypt.hash(generatedPassword, 10);
 
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: "sandbox.smtp.mailtrap.io",
+      port: 2525,
       auth: {
-        user: 'davideciullo2@gmail.com',
-        pass: 'progetto' // Usa app password
+        user: "5fec793739f924",
+        pass: "15eb9f39286b92"
       }
     });
 
     const mailOptions = {
-      from: 'davideciullo2@gmail.com',
+      from: 'noreply@dietiestates.it',
       to: pec,
       subject: 'Benvenuto su DietiEstates25',
       text: `Grazie per esserti registrato.\nLe tue credenziali:\nUsername: ${societa}\nPassword: ${generatedPassword}`
     };
 
-    const info = await transporter.sendMail(mailOptions);
+    let mailSent = false;
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log("Info invio mail:", info);
+      if (info.accepted && info.accepted.length > 0) {
+        mailSent = true;
+        console.log("Mail inviata correttamente");
+      } else {
+        console.log("Mail non accettata da destinatario");
+      }
+    } catch (mailErr) {
+      console.error("Errore nell'invio mail:", mailErr);
+    }
 
-    if (!info.accepted || info.accepted.length === 0) {
+    if (!mailSent) {
+      console.log("Mail NON inviata, blocco inserimento dati");
       return res.status(500).json({ error: "Invio email fallito, registrazione annullata" });
     }
 
+    console.log("Mail inviata, inserisco dati nel DB");
+
     await pool.query(
-      "INSERT INTO users (username, password, email, telefono, ruolo) VALUES ($1, $2, $3, $4, $5)",
-      [societa, hashedPassword, pec, telefono, 'amministratore']
+      `INSERT INTO public.users (username, password, email, telefono, ruolo, azienda) 
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [societa, hashedPassword, pec, telefono, 'amministratore', societa]
     );
 
-    res.status(201).json({ message: "Azienda registrata con successo. Controlla l'email per la password." });
+    console.log("Dati inseriti con successo");
+
+    return res.status(201).json({ message: "Azienda registrata con successo. Controlla l'email per la password." });
 
   } catch (err) {
     console.error("Errore in /register-agency:", err);
+    return res.status(500).json({ error: "Errore server interno" });
+  }
+});
+
+//cambio password amministratore-----------------------------------------------------------------------------------------------
+
+router.post("/change-password", authenticateToken, async (req, res) => {
+  try {
+    const { vecchiaPassword, nuovaPassword } = req.body;
+    const username = req.user.username;  
+
+    if (!vecchiaPassword || !nuovaPassword) {
+      return res.status(400).json({ error: "Vecchia o nuova password mancante" });
+    }
+
+    const userResult = await pool.query("SELECT password FROM users WHERE username = $1", [username]);
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: "Utente non trovato" });
+    }
+
+    const user = userResult.rows[0];
+
+    const match = await bcrypt.compare(vecchiaPassword, user.password);
+    if (!match) {
+      return res.status(401).json({ error: "Vecchia password errata" });
+    }
+
+    const hashedNewPassword = await bcrypt.hash(nuovaPassword, 10);
+
+    await pool.query("UPDATE users SET password = $1 WHERE username = $2", [hashedNewPassword, username]);
+
+    res.json({ message: "Password aggiornata con successo" });
+  } catch (err) {
+    console.error("Errore in /change-password:", err);
     res.status(500).json({ error: "Errore server interno" });
+  }
+});
+
+//rotta per prendere il nome dell azienda dal token------------------------------------------------------------------------
+
+router.get('/NomeAzienda', authenticateToken, async (req, res) => {
+  try {
+    const username = req.user.username; 
+    const result = await pool.query('SELECT azienda FROM users WHERE username = $1', [username]);
+
+    if (result.rows.length === 0) 
+      return res.status(404).json({ error: "Utente non trovato" });
+
+    return res.json({ azienda: result.rows[0].azienda });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Errore server" });
   }
 });
 
 // AGGIUNGI AGENTE----------------------------------------------------------------------------------------------------
 
-router.post("/add-agent", async (req, res) => {
+router.post("/add-agent", authenticateToken, async (req, res) => {
   try {
-    const { nome, email, password, confermaPassword } = req.body;
+    let { nome, email, password, confermaPassword } = req.body;
 
     if (!nome || !email || !password || !confermaPassword) {
       return res.status(400).json({ error: "Tutti i campi sono obbligatori" });
@@ -136,26 +208,80 @@ router.post("/add-agent", async (req, res) => {
       return res.status(400).json({ error: "Le password non corrispondono" });
     }
 
-    const baseUsername = nome.toLowerCase().replace(/\s+/g, '');
-    let finalUsername = baseUsername + Math.floor(Math.random() * 1000);
-
-    let userExist = await pool.query("SELECT username FROM users WHERE username = $1", [finalUsername]);
-    while (userExist.rows.length > 0) {
-      finalUsername = baseUsername + Math.floor(Math.random() * 1000);
-      userExist = await pool.query("SELECT username FROM users WHERE username = $1", [finalUsername]);
+    const userExist = await pool.query("SELECT username FROM users WHERE username = $1", [nome]);
+    if (userExist.rows.length > 0) {
+      return res.status(400).json({ error: "Username già utilizzato." });
     }
+
+    const creatoreUsername = req.user.username;
+
+    const aziendaResult = await pool.query(
+      "SELECT azienda FROM users WHERE username = $1",
+      [creatoreUsername]
+    );
+    if (aziendaResult.rows.length === 0) {
+      return res.status(404).json({ error: "Utente creatore non trovato" });
+    }
+    const azienda = aziendaResult.rows[0].azienda;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await pool.query(
-      "INSERT INTO users (username, password, email, telefono, ruolo) VALUES ($1, $2, $3, $4, $5)",
-      [finalUsername, hashedPassword, email, null, "agente"]
+      `INSERT INTO users (username, password, email, telefono, ruolo, azienda) VALUES ($1, $2, $3, $4, $5, $6)`,
+      [nome, hashedPassword, email, null, "agente", azienda]
     );
 
-    res.status(201).json({ message: `Agente ${finalUsername} registrato con successo.` });
+    res.status(201).json({ message: `Agente ${nome} registrato con successo.` });
 
   } catch (err) {
     console.error("Errore in /add-agent:", err);
+    res.status(500).json({ error: "Errore server interno" });
+  }
+});
+
+//AGGIUNGI MEMBRO---------------------------------------------------------------------------------------------------------------- 
+
+router.post("/add-member", authenticateToken, async (req, res) => {
+  try {
+    const { nome, email, password, confermaPassword, ruolo } = req.body;
+    const creatoreUsername = req.user.username;
+
+    if (!nome || !email || !password || !confermaPassword || !ruolo) {
+      return res.status(400).json({ error: "Tutti i campi sono obbligatori" });
+    }
+
+    if (password !== confermaPassword) {
+      return res.status(400).json({ error: "Le password non corrispondono" });
+    }
+
+    const userExist = await pool.query(
+      "SELECT username FROM users WHERE username = $1",
+      [nome]
+    );
+    if (userExist.rows.length > 0) {
+      return res.status(400).json({ error: "Nome utente già esistente, scegli un altro nome." });
+    }
+
+    const aziendaResult = await pool.query(
+      "SELECT azienda FROM users WHERE username = $1",
+      [creatoreUsername]
+    );
+    if (aziendaResult.rows.length === 0) {
+      return res.status(404).json({ error: "Utente creatore non trovato" });
+    }
+
+    const azienda = aziendaResult.rows[0].azienda;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await pool.query(
+      "INSERT INTO users (username, password, email, telefono, ruolo, azienda) VALUES ($1, $2, $3, $4, $5, $6)",
+      [nome, hashedPassword, email, null, ruolo === "gestore" ? "gestore" : "agente", azienda]
+    );
+
+    res.status(201).json({ message: `Membro ${nome} (${ruolo}) registrato con successo nella azienda ${azienda}.` });
+  } catch (err) {
+    console.error("Errore in /add-member:", err);
     res.status(500).json({ error: "Errore server interno" });
   }
 });
@@ -240,23 +366,6 @@ router.get("/immobili/miei", authenticateToken, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Errore nel recupero immobili" });
-  }
-});
-
-//rotta per prendere il nome dell azienda dal token------------------------------------------------------------------------
-
-router.get('/NomeAzienda', authenticateToken, async (req, res) => {
-  try {
-    const username = req.user.username; 
-    const result = await pool.query('SELECT azienda FROM users WHERE username = $1', [username]);
-
-    if (result.rows.length === 0) 
-      return res.status(404).json({ error: "Utente non trovato" });
-
-    return res.json({ azienda: result.rows[0].azienda });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Errore server" });
   }
 });
 
