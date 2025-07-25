@@ -32,7 +32,7 @@ export default function SignUpForm() {
         setUsername("");
         setEmail("");
         setPassword("");
-        router.push("/"); // Redirect dopo registrazione OK
+        router.push("/"); 
       } else {
         setError(data.error || "Errore durante la registrazione");
       }
@@ -43,7 +43,7 @@ export default function SignUpForm() {
 
   return (
     <section className="min-h-screen grid grid-cols-1 md:grid-cols-2">
-      {/* La parte sinistra */}
+
       <div
         className="relative flex items-center justify-center bg-cover bg-center bg-no-repeat px-8 py-16"
         style={{ backgroundImage: 'url("/immagine-registrati.png")' }}
@@ -65,7 +65,6 @@ export default function SignUpForm() {
         </div>
       </div>
 
-      {/* La parte destra */}
       <div
         id="registrazione"
         className="flex flex-col items-center justify-center px-6 py-16 bg-white shadow-xl"

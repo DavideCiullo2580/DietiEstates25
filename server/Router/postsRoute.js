@@ -10,7 +10,7 @@ const upload = require("../Middleware/uploadMiddleware");
 const JWT_SECRET = 'Token';
 
 
-// LOGIN
+// LOGIN----------------------------------------------------------------------------------------------------------------
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -42,7 +42,7 @@ router.post("/login", async (req, res) => {
 });
 
 
-// REGISTER UTENTE
+// REGISTER UTENTE----------------------------------------------------------------------------------------------------------------
 router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -71,7 +71,7 @@ router.post("/register", async (req, res) => {
 });
 
 
-// REGISTER AGENZIA
+// REGISTER AGENZIA----------------------------------------------------------------------------------------------------------------
 router.post("/register-agency", async (req, res) => {
   try {
     const { societa, pec, telefono } = req.body;
@@ -122,8 +122,8 @@ router.post("/register-agency", async (req, res) => {
   }
 });
 
+// AGGIUNGI AGENTE----------------------------------------------------------------------------------------------------
 
-// AGGIUNGI AGENTE
 router.post("/add-agent", async (req, res) => {
   try {
     const { nome, email, password, confermaPassword } = req.body;
@@ -160,8 +160,8 @@ router.post("/add-agent", async (req, res) => {
   }
 });
 
+// AGGIUNGI IMMOBILE------------------------------------------------------------------------------------------------------
 
-// AGGIUNGI IMMOBILE
 router.post("/immobili", authenticateToken, upload.array('immagini'), async (req, res) => {
   try {
     const {
@@ -179,9 +179,7 @@ router.post("/immobili", authenticateToken, upload.array('immagini'), async (req
 
     if (!tipoAnnuncio || !tipoImmobile || !prezzo) {
       return res.status(400).json({ error: "Tutti i campi obbligatori sono obbligatori" });
-    }
-
-    
+    } 
 
     let serviziArray;
     try {
@@ -191,10 +189,8 @@ router.post("/immobili", authenticateToken, upload.array('immagini'), async (req
       return res.status(400).json({ error: "Formato servizi non valido" });
     }
 
-    // Prendi username dal token (che ora è salvato in req.user.username)
     const agenteUsername = req.user.username;
 
-    // Inserisci immobile con agente_id = username dell'agente
     const result = await pool.query(
       `INSERT INTO immobili (tipo_annuncio, tipo_immobile, prezzo, dimensioni, stanze, piano, indirizzo, classe_energetica, descrizione, servizi, agente_id) 
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
@@ -247,5 +243,21 @@ router.get("/immobili/miei", authenticateToken, async (req, res) => {
   }
 });
 
+//rotta per prendere il nome dell azienda dal token------------------------------------------------------------------------
+
+router.get('/NomeAzienda', authenticateToken, async (req, res) => {
+  try {
+    const username = req.user.username; 
+    const result = await pool.query('SELECT azienda FROM users WHERE username = $1', [username]);
+
+    if (result.rows.length === 0) 
+      return res.status(404).json({ error: "Utente non trovato" });
+
+    return res.json({ azienda: result.rows[0].azienda });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Errore server" });
+  }
+});
 
 module.exports = router;
