@@ -72,7 +72,17 @@ const handleSubmit = async (e) => {
 
     if (res.ok) {
       alert("Immobile aggiunto con successo!");
-      // Pulisci form se vuoi
+      setTipoAnnuncio("");
+      setTipoImmobile("");
+      setPrezzo("");
+      setDimensioni("");
+      setStanze("");
+      setPiano("");
+      setIndirizzo("");
+      setClasseEnergetica("");
+      setDescrizione("");
+      setServizi([]);
+      setFiles([]);
     } else {
       const errorData = await res.json();
       alert("Errore: " + (errorData.message || "nell'aggiunta dell'immobile"));

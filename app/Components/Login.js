@@ -44,10 +44,6 @@ export default function Login() {
           router.push('/HomeAgenteImmobiliare');
           break;
         default:
-<<<<<<< HEAD
-=======
-          
->>>>>>> 7e81a3409bf699498340dbc459b37bda048da0fa
           router.push('/');
           break;
       }
