@@ -54,6 +54,13 @@ export default function ImmobiliPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {immobili.map((immobile) => (
               <div key={immobile.id} className="border rounded shadow p-4">
+              <img
+                src={immobile.immagine_url || "/placeholder.jpg"}
+                alt={`Immagine di ${immobile.tipo_immobile}`}
+                className="w-full h-48 object-cover rounded mb-4"
+              />
+
+
                 <h2 className="text-xl font-semibold mb-2">{immobile.tipo_immobile}</h2>
                 <p className="text-gray-700 mb-1">📍 {immobile.indirizzo}</p>
                 <p className="text-gray-700 mb-1">💶 €{immobile.prezzo}</p>

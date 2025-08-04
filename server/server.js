@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require('body-parser');
+const path = require('path');
 const app = express();
 
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -9,6 +10,7 @@ const PORT = 8080;
 
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 
 const postsRoute = require('./Router/postsRoute');

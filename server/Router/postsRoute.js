@@ -304,7 +304,7 @@ router.post("/immobili", authenticateToken, upload.array('immagini'), async (req
     } = req.body;
 
     if (!tipoAnnuncio || !tipoImmobile || !prezzo) {
-      return res.status(400).json({ error: "Tutti i campi obbligatori sono obbligatori" });
+      return res.status(400).json({ error: "Tutti i campi sono obbligatori" });
     } 
 
     let serviziArray;
@@ -359,14 +359,36 @@ router.get("/immobili/miei", authenticateToken, async (req, res) => {
 
   try {
     const result = await pool.query(
-      "SELECT * FROM immobili WHERE agente_id = $1 ORDER BY created_at DESC",
+      `
+      SELECT i.*, img.path AS immagine_url
+      FROM immobili i
+      LEFT JOIN (
+        SELECT DISTINCT ON (immobile_id) immobile_id, path
+        FROM immagini_immobile
+        ORDER BY immobile_id, id ASC
+      ) img ON i.id = img.immobile_id
+      WHERE i.agente_id = $1
+      ORDER BY i.created_at DESC
+      `,
       [agenteUsername]
     );
-    res.json(result.rows);
+
+    const immobili = result.rows.map((immobile) => ({
+      ...immobile,
+      immagine_url: immobile.immagine_url
+        ? `http://localhost:8080/uploads/${immobile.immagine_url}`
+        : null,
+    }));
+
+    console.log("Immobile con immagini:", immobili);
+
+
+    res.json(immobili);
   } catch (err) {
-    console.error(err);
+    console.error("Errore nella route /immobili/miei:", err);
     res.status(500).json({ message: "Errore nel recupero immobili" });
   }
 });
+;
 
 module.exports = router;
