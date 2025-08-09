@@ -11,6 +11,7 @@ export default function AggiungiImmobile() {
   const [stanze, setStanze] = useState("");
   const [piano, setPiano] = useState("");
   const [indirizzo, setIndirizzo] = useState("");
+  const [comune, setComune] = useState("");
   const [classeEnergetica, setClasseEnergetica] = useState("");
   const [descrizione, setDescrizione] = useState("");
   const [servizi, setServizi] = useState([]);
@@ -51,8 +52,9 @@ const handleSubmit = async (e) => {
   formData.append("indirizzo", indirizzo);
   formData.append("classeEnergetica", classeEnergetica);
   formData.append("descrizione", descrizione);
-  
-    const serviziArray = servizi; // adatta in base al tuo codice
+  formData.append("comune", comune);
+
+  const serviziArray = servizi;
   formData.append("servizi", JSON.stringify(serviziArray));
 
   for (let i = 0; i < files.length; i++) {
@@ -79,6 +81,7 @@ const handleSubmit = async (e) => {
       setStanze("");
       setPiano("");
       setIndirizzo("");
+      setComune("");
       setClasseEnergetica("");
       setDescrizione("");
       setServizi([]);
@@ -192,6 +195,17 @@ const handleSubmit = async (e) => {
                 className="w-full p-2 border border-gray-300"
                 value={indirizzo}
                 onChange={(e) => setIndirizzo(e.target.value)}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block font-semibold mb-1">Comune</label>
+              <input
+                type="text"
+                className="w-full p-2 border border-gray-300"
+                value={comune}
+                onChange={(e) => setComune(e.target.value)}
                 required
               />
             </div>

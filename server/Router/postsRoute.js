@@ -287,9 +287,10 @@ router.post("/add-member", authenticateToken, async (req, res) => {
 });
 
 // AGGIUNGI IMMOBILE------------------------------------------------------------------------------------------------------
-
 router.post("/immobili", authenticateToken, upload.array('immagini'), async (req, res) => {
+
   try {
+    
     const {
       tipoAnnuncio,
       tipoImmobile,
@@ -300,8 +301,11 @@ router.post("/immobili", authenticateToken, upload.array('immagini'), async (req
       indirizzo,
       classeEnergetica,
       descrizione,
-      servizi
+      servizi,
+      comune
     } = req.body;
+
+
 
     if (!tipoAnnuncio || !tipoImmobile || !prezzo) {
       return res.status(400).json({ error: "Tutti i campi sono obbligatori" });
@@ -318,8 +322,8 @@ router.post("/immobili", authenticateToken, upload.array('immagini'), async (req
     const agenteUsername = req.user.username;
 
     const result = await pool.query(
-      `INSERT INTO immobili (tipo_annuncio, tipo_immobile, prezzo, dimensioni, stanze, piano, indirizzo, classe_energetica, descrizione, servizi, agente_id) 
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
+      `INSERT INTO immobili (tipo_annuncio, tipo_immobile, prezzo, dimensioni, stanze, piano, indirizzo, classe_energetica, descrizione, servizi, agente_id, comune) 
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
       [
         tipoAnnuncio,
         tipoImmobile,
@@ -331,7 +335,8 @@ router.post("/immobili", authenticateToken, upload.array('immagini'), async (req
         classeEnergetica,
         descrizione,
         JSON.stringify(serviziArray),
-        agenteUsername
+        agenteUsername,
+        comune
       ]
     );
 
@@ -354,6 +359,7 @@ router.post("/immobili", authenticateToken, upload.array('immagini'), async (req
   }
 });
 
+// VISUALIZZA IMMOBILI DELL'AGENTE-----------------------------------------------------------------------------------------
 router.get("/immobili/miei", authenticateToken, async (req, res) => {
   const agenteUsername = req.user.username;
 
@@ -380,8 +386,6 @@ router.get("/immobili/miei", authenticateToken, async (req, res) => {
         : null,
     }));
 
-    console.log("Immobile con immagini:", immobili);
-
 
     res.json(immobili);
   } catch (err) {
@@ -390,5 +394,110 @@ router.get("/immobili/miei", authenticateToken, async (req, res) => {
   }
 });
 ;
+
+
+
+
+//VISUALIZZA IMMOBILI-----------------------------------------------------------------------------------------
+router.get("/immobili", authenticateToken, async (req, res) => {
+  try {
+    const {
+      tipo_annuncio,
+      tipo_immobile,
+      prezzoMin,
+      prezzoMax,
+      stanzeMin,
+      classeEnergetica,
+      comune,
+    } = req.query;
+
+
+    const conditions = [];
+    const values = [];
+    let index = 1;
+
+    if (tipo_annuncio) {
+      conditions.push(`tipo_annuncio = $${index++}`);
+      values.push(tipo_annuncio);
+    }
+    if (tipo_immobile) {
+      conditions.push(`tipo_immobile = $${index++}`);
+      values.push(tipo_immobile);
+    }
+    if (prezzoMin) {
+      conditions.push(`prezzo >= $${index++}`);
+      values.push(Number(prezzoMin));
+    }
+    if (prezzoMax) {
+      conditions.push(`prezzo <= $${index++}`);
+      values.push(Number(prezzoMax));
+    }
+    if (stanzeMin) {
+      conditions.push(`stanze >= $${index++}`);
+      values.push(Number(stanzeMin));
+    }
+    if (classeEnergetica) {
+      conditions.push(`classe_energetica = $${index++}`);
+      values.push(classeEnergetica);
+    }
+    if (comune) {
+      conditions.push(`comune = $${index++}`);
+      values.push(comune);
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    const query = `
+      SELECT i.*, img.path AS immagine_url
+      FROM immobili i
+      LEFT JOIN (
+        SELECT DISTINCT ON (immobile_id) immobile_id, path
+        FROM immagini_immobile
+        ORDER BY immobile_id, id ASC
+      ) img ON i.id = img.immobile_id
+      ${whereClause}
+      ORDER BY i.created_at DESC
+    `;
+
+
+    const result = await pool.query(query, values);
+
+  
+    const immobili = result.rows.map((immobile) => ({
+      ...immobile,
+      immagine_url: immobile.immagine_url
+        ? `http://localhost:8080/uploads/${immobile.immagine_url}`
+        : null,
+    }));
+
+    res.json(immobili);
+  } catch (err) {
+    console.error("Errore nella route /immobili:", err);
+    res.status(500).json({ message: "Errore nel recupero immobili" });
+  }
+});
+
+//AGGIORNA VISUALIZZAZIONI IMMOBILE-----------------------------------------------------------------------------------------
+router.post("/immobili/:id/aggiorna-visualizzazioni", async (req, res) => {
+  const immobileId = req.params.id;
+
+  try {
+
+    const result = await pool.query(
+      "UPDATE immobili SET visualizzazioni = COALESCE(visualizzazioni, 0) + 1 WHERE id = $1 RETURNING visualizzazioni",
+      [immobileId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Immobile non trovato" });
+    }
+
+    res.json({ message: "Visualizzazioni aggiornate", visualizzazioni: result.rows[0].visualizzazioni });
+  } catch (err) {
+    console.error("Errore in /immobili/:id/aggiorna-visualizzazioni:", err);
+    res.status(500).json({ error: "Errore server interno" });
+  }
+});
+
 
 module.exports = router;
