@@ -14,8 +14,8 @@ const JWT_SECRET = 'Token';
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
-
     const userResult = await pool.query("SELECT * FROM users WHERE username = $1", [username]);
+
     if (userResult.rows.length === 0) {
       return res.status(401).json({ error: "Credenziali non valide" });
     }
@@ -29,13 +29,8 @@ router.post("/login", async (req, res) => {
 
     const token = jwt.sign({ username: user.username }, JWT_SECRET, { expiresIn: '1h' });
 
-    res.json({
-      token,
-      role: user.ruolo  
-    });
-
+    res.json({ token, role: user.ruolo });
   } catch (err) {
-    console.error("Errore in /login:", err);
     res.sendStatus(500);
   }
 });
@@ -393,12 +388,9 @@ router.get("/immobili/miei", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Errore nel recupero immobili" });
   }
 });
-;
-
-
-
 
 //VISUALIZZA IMMOBILI-----------------------------------------------------------------------------------------
+
 router.get("/immobili", authenticateToken, async (req, res) => {
   try {
     const {
