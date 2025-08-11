@@ -11,12 +11,12 @@ describe('POST /posts/change-password', () => {
   let token;
 
   beforeAll(async () => {
-    // Login per ottenere token reale
+
     const loginRes = await request(app)
-      .post('/posts/login')               // usa l'endpoint reale di login
+      .post('/posts/login')             
       .send({ username, password: oldPassword });
 
-    token = loginRes.body.token;    // supponendo che il token arrivi così
+    token = loginRes.body.token;   
 
     if (!token) {
       throw new Error('Login fallito, token non ricevuto');
@@ -24,14 +24,14 @@ describe('POST /posts/change-password', () => {
   });
 
   afterAll(async () => {
-    // Ripristina la password originale per non lasciare effetti collaterali
+ 
     const hashedOldPassword = await bcrypt.hash(oldPassword, 10);
     await pool.query('UPDATE users SET password = $1 WHERE username = $2', [hashedOldPassword, username]);
     await pool.end();
   });
 
   test('cambia la password correttamente e ripristina dopo', async () => {
-    // Cambia password da oldPassword a newPassword
+
     const res = await request(app)
       .post('/posts/change-password')
       .set('Authorization', `Bearer ${token}`)
@@ -40,7 +40,6 @@ describe('POST /posts/change-password', () => {
     expect(res.status).toBe(200);
     expect(res.body.message).toBe('Password aggiornata con successo');
 
-    // Cambia password da newPassword a oldPassword per ripristinare
     const res2 = await request(app)
       .post('/posts/change-password')
       .set('Authorization', `Bearer ${token}`)
@@ -64,7 +63,7 @@ describe('POST /posts/change-password', () => {
     const res = await request(app)
       .post('/posts/change-password')
       .set('Authorization', `Bearer ${token}`)
-      .send({ vecchiaPassword: oldPassword }); // manca nuovaPassword
+      .send({ vecchiaPassword: oldPassword }); 
 
     expect(res.status).toBe(400);
     expect(res.body.error).toBe('Vecchia o nuova password mancante');
