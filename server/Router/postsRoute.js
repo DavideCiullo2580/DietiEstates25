@@ -170,7 +170,7 @@ router.post("/change-password", authenticateToken, async (req, res) => {
     console.error("Errore in /change-password:", err);
     res.status(500).json({ error: "Errore server interno" });
   }
-});
+}); 
 
 //rotta per prendere il nome dell azienda dal token------------------------------------------------------------------------
 
