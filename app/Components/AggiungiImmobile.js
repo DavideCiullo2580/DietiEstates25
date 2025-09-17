@@ -17,7 +17,21 @@ export default function AggiungiImmobile() {
   const [servizi, setServizi] = useState([]);
   const [files, setFiles] = useState([]);
 
+  const [message, setMessage] = useState("");   
+  const [messageType, setMessageType] = useState("");
+
   const serviziList = ["Portineria", "Ascensore", "Giardino", "Climatizzazione", "Posto Auto"];
+
+const showMessage = (text, type = "success", duration = 3000) => {
+  setMessage(text);
+  setMessageType(type);
+
+  setTimeout(() => {
+    setMessage("");
+    setMessageType("");
+  }, duration);
+};
+
 
   const handleServiziChange = (servizio) => {
     setServizi(prev => {
@@ -71,9 +85,12 @@ const handleSubmit = async (e) => {
       body: formData,
     });
 
+    const result = await res.json();
 
     if (res.ok) {
-      alert("Immobile aggiunto con successo!");
+      showMessage(result.message || "Immobile aggiunto con successo", "success");
+
+
       setTipoAnnuncio("");
       setTipoImmobile("");
       setPrezzo("");
@@ -86,13 +103,16 @@ const handleSubmit = async (e) => {
       setDescrizione("");
       setServizi([]);
       setFiles([]);
+
     } else {
-      const errorData = await res.json();
-      alert("Errore: " + (errorData.message || "nell'aggiunta dell'immobile"));
+
+    showMessage(result.message || "Errore nell'aggiunta dell'immobile", "error");
+
     }
   } catch (error) {
     console.error(error);
-    alert("Errore di connessione");
+    showMessage("Errore di connessione", "error");
+
   }
 };
 
@@ -267,6 +287,12 @@ const handleSubmit = async (e) => {
                   </label>
                 ))}
               </div>
+              {message && (
+               <div 
+              className={`my-4 p-3 rounded ${messageType === "success" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>
+            {message}
+          </div>
+          )}
             </div>
 
             <div className="text-center pt-4">
@@ -276,7 +302,7 @@ const handleSubmit = async (e) => {
               >
                 Aggiungi Immobile
               </button>
-            </div>
+            </div>          
           </form>
         </div>
       </main>

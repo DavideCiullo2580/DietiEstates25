@@ -285,7 +285,6 @@ router.post("/add-member", authenticateToken, async (req, res) => {
 router.post("/immobili", authenticateToken, upload.array('immagini'), async (req, res) => {
 
   try {
-    
     const {
       tipoAnnuncio,
       tipoImmobile,
@@ -300,11 +299,9 @@ router.post("/immobili", authenticateToken, upload.array('immagini'), async (req
       comune
     } = req.body;
 
-
-
     if (!tipoAnnuncio || !tipoImmobile || !prezzo) {
       return res.status(400).json({ error: "Tutti i campi sono obbligatori" });
-    } 
+    }
 
     let serviziArray;
     try {
@@ -316,9 +313,29 @@ router.post("/immobili", authenticateToken, upload.array('immagini'), async (req
 
     const agenteUsername = req.user.username;
 
+    const apiKey = process.env.GEOAPIFY_API_KEY;
+    if (!apiKey) throw new Error("Chiave API Geoapify non configurata");
+
+    const encodedAddress = encodeURIComponent(`${indirizzo}, ${comune}`);
+    const geoUrl = `https://api.geoapify.com/v1/geocode/search?text=${encodedAddress}&type=street&apiKey=${apiKey}`;
+
+
+    const geoRes = await fetch(geoUrl);
+    const geoData = await geoRes.json();
+
+
+    if (!geoData.features || geoData.features.length === 0) {
+      return res.status(400).json({ error: "Indirizzo non trovato" });
+    }
+
+    const lat = geoData.features[0].properties.lat;
+    const lng = geoData.features[0].properties.lon;
+
+  
     const result = await pool.query(
-      `INSERT INTO immobili (tipo_annuncio, tipo_immobile, prezzo, dimensioni, stanze, piano, indirizzo, classe_energetica, descrizione, servizi, agente_id, comune) 
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
+      `INSERT INTO immobili 
+        (tipo_annuncio, tipo_immobile, prezzo, dimensioni, stanze, piano, indirizzo, classe_energetica, descrizione, servizi, agente_id, comune, lat, lng) 
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *`,
       [
         tipoAnnuncio,
         tipoImmobile,
@@ -331,12 +348,15 @@ router.post("/immobili", authenticateToken, upload.array('immagini'), async (req
         descrizione,
         JSON.stringify(serviziArray),
         agenteUsername,
-        comune
+        comune,
+        lat,
+        lng
       ]
     );
 
     const immobileId = result.rows[0].id;
 
+    
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         await pool.query(
@@ -353,6 +373,7 @@ router.post("/immobili", authenticateToken, upload.array('immagini'), async (req
     res.status(500).json({ error: "Errore server interno" });
   }
 });
+
 
 // VISUALIZZA IMMOBILI DELL'AGENTE-----------------------------------------------------------------------------------------
 router.get("/immobili/miei", authenticateToken, async (req, res) => {

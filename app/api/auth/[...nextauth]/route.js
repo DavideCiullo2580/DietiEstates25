@@ -1,6 +1,4 @@
 
-//ADRI NON MODIFICARE STO FILE CHE MI HA FATTO DANNARE E LO FARà ANCORA PER MOLTO
-
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";

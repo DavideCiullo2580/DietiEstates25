@@ -1,8 +1,9 @@
-
 const express = require("express");
 const bodyParser = require('body-parser');
 const path = require('path');
 const cors = require("cors");
+require('dotenv').config({ path: path.join(__dirname, '.env.local') });
+
 
 const app = express();
 
