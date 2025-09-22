@@ -1,14 +1,49 @@
 "use client";
-import React from "react";
+import { useState } from "react";
 import NavbarUtente from "../Components/NavbarUtente";
-import ImmobiliVicini from "../Components/ImmobiliVicini";
 import Footer from "../Components/Footer";
+import ListaImmobili from "../Components/ListaImmobili";
+import MappaImmobili from "../Components/MappaImmobili";
+import ModaleDettagliImmobile from "../Components/ModaleDettagliImmobile";
 
-export default function HomeUtente() {
+export default function ImmobiliPage() {
+  const [immobili, setImmobili] = useState([]);
+  const [immobileSelezionato, setImmobileSelezionato] = useState(null);
+
   return (
     <>
+      {/* Navbar */}
       <NavbarUtente />
-      <ImmobiliVicini />
+
+      <div className="px-4 py-10 lg:max-w-7xl lg:mx-auto lg:flex lg:gap-6">
+        {/* Lista immobili (colonna sinistra) */}
+        <div className="lg:w-1/2 h-[80vh] overflow-y-auto">
+          <ListaImmobili
+            immobili={immobili}
+            setImmobili={setImmobili}
+            onSelectImmobile={setImmobileSelezionato}
+          />
+        </div>
+
+        {/* Mappa (colonna destra, fissa) */}
+        <div className="lg:w-1/2 h-[80vh] sticky top-0">
+          <MappaImmobili
+            immobili={immobili}
+            immobileSelezionato={immobileSelezionato}
+            onSelectImmobile={setImmobileSelezionato}
+          />
+        </div>
+      </div>
+
+      {/* Modale dettagli immobile */}
+      {immobileSelezionato && (
+        <ModaleDettagliImmobile
+          immobile={immobileSelezionato}
+          onClose={() => setImmobileSelezionato(null)}
+        />
+      )}
+
+      {/* Footer */}
       <Footer />
     </>
   );
