@@ -171,7 +171,7 @@ router.post("/change-password", authenticateToken, async (req, res) => {
     res.status(500).json({ error: "Errore server interno" });
   }
 }); 
-
+ 
 //rotta per prendere il nome dell azienda dal token------------------------------------------------------------------------
 
 router.get('/NomeAzienda', authenticateToken, async (req, res) => {
@@ -562,6 +562,42 @@ router.post("/immobili/:id/aggiorna-visualizzazioni", async (req, res) => {
     res.json({ message: "Visualizzazioni aggiornate", visualizzazioni: result.rows[0].visualizzazioni });
   } catch (err) {
     console.error("Errore in /immobili/:id/aggiorna-visualizzazioni:", err);
+    res.status(500).json({ error: "Errore server interno" });
+  }
+});
+
+//VISUALIZZA IMMOBILI PER LA DASHBOARD---------------------------------------------------------------------------------------------
+
+router.get("/DashboardImmobili", authenticateToken, async (req, res) => {
+  try {
+    const agenteUsername = req.user.username;
+
+    // Recupera gli immobili dell'agente con una immagine associata (se esiste)
+    const result = await pool.query(
+      `
+      SELECT i.*, img.path AS immagine_url
+      FROM immobili i
+      LEFT JOIN (
+          SELECT DISTINCT ON (immobile_id) immobile_id, path
+          FROM immagini_immobile
+          ORDER BY immobile_id, id ASC
+      ) img ON i.id = img.immobile_id
+      WHERE i.agente_id = $1
+      ORDER BY i.created_at DESC
+      `,
+      [agenteUsername]
+    );
+
+    const immobili = result.rows.map((immobile) => ({
+      ...immobile,
+      immagine_url: immobile.immagine_url
+        ? `http://localhost:8080/uploads/${immobile.immagine_url}`
+        : null,
+    }));
+
+    res.status(200).json({ immobili });
+  } catch (err) {
+    console.error("Errore in /DashboardImmobili:", err);
     res.status(500).json({ error: "Errore server interno" });
   }
 });
