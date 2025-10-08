@@ -27,7 +27,7 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
       }
 
       const queryParams = new URLSearchParams(filtriParam).toString();
-      const res = await fetch(`http://localhost:8080/posts/immobili/tutti?${queryParams}`, {
+      const res = await fetch(`http://localhost:8080/posts/immobili/miei?${queryParams}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

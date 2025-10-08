@@ -12,11 +12,9 @@ export default function ImmobiliPage() {
 
   return (
     <>
-      {/* Navbar */}
       <NavbarUtente />
 
       <div className="px-4 py-10 lg:max-w-7xl lg:mx-auto lg:flex lg:gap-6">
-        {/* Lista immobili (colonna sinistra) */}
         <div className="lg:w-1/2 h-[80vh] overflow-y-auto">
           <ListaImmobili
             immobili={immobili}
@@ -25,7 +23,6 @@ export default function ImmobiliPage() {
           />
         </div>
 
-        {/* Mappa (colonna destra, fissa) */}
         <div className="lg:w-1/2 h-[80vh] sticky top-0">
           <MappaImmobili
             immobili={immobili}
@@ -34,8 +31,7 @@ export default function ImmobiliPage() {
           />
         </div>
       </div>
-
-      {/* Modale dettagli immobile */}
+      
       {immobileSelezionato && (
         <ModaleDettagliImmobile
           immobile={immobileSelezionato}
@@ -43,7 +39,6 @@ export default function ImmobiliPage() {
         />
       )}
 
-      {/* Footer */}
       <Footer />
     </>
   );

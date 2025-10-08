@@ -11,7 +11,7 @@ export default function DashboardPage() {
       </h1>
 
       <div className="max-w-5xl mx-auto space-y-6">
-        {/* Qui metterai la lista di immobili dinamica */}
+        
         <p className="text-center text-gray-600">
           Nessun immobile da visualizzare.
         </p>

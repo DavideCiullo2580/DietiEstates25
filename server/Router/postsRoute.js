@@ -405,14 +405,14 @@ router.get("/immobili/miei", authenticateToken, async (req, res) => {
 
     res.json(immobili);
   } catch (err) {
-    console.error("Errore nella route /immobili/miei:", err);
+    console.error("Errore nella route /immobili/miei:", err); 
     res.status(500).json({ message: "Errore nel recupero immobili" });
   }
 });
 
 //VISUALIZZA IMMOBILI-----------------------------------------------------------------------------------------
 
-router.get("/immobili", authenticateToken, async (req, res) => {
+router.get("/immobili/tutti", authenticateToken, async (req, res) => {
   try {
     const {
       tipo_annuncio,
@@ -490,7 +490,61 @@ router.get("/immobili", authenticateToken, async (req, res) => {
   }
 });
 
+// VISUALIZZA IMMOBILI AZIENDA -----------------------------------------------------------------------------------------
+
+router.get('/immobili/azienda', authenticateToken, async (req, res) => {
+  try {
+    const username = req.user.username; // prendo lo username dal token
+
+    // Recupero l'azienda dal DB
+    const aziendaResult = await pool.query(
+      'SELECT azienda FROM users WHERE username = $1',
+      [username]
+    );
+
+    if (aziendaResult.rows.length === 0) {
+      return res.status(404).json({ error: "Utente non trovato" });
+    }
+
+    const azienda = aziendaResult.rows[0].azienda;
+
+    // Ora recupero gli immobili degli agenti della stessa azienda
+    const result = await pool.query(
+      `
+      SELECT i.*, img.path AS immagine_url
+      FROM immobili i
+      JOIN users u 
+        ON i.agente_id = u.username
+      LEFT JOIN (
+          SELECT DISTINCT ON (immobile_id) immobile_id, path
+          FROM immagini_immobile
+          ORDER BY immobile_id, id ASC
+      ) img ON i.id = img.immobile_id
+      WHERE u.azienda = $1
+        AND u.ruolo = 'agente'
+      ORDER BY i.created_at DESC
+      `,
+      [azienda]
+    );
+
+    const immobili = result.rows.map((immobile) => ({
+      ...immobile,
+      immagine_url: immobile.immagine_url
+        ? `http://localhost:8080/uploads/${immobile.immagine_url}`
+        : null,
+    }));
+
+    res.json(immobili);
+  } catch (err) {
+    console.error("Errore in /immobili/azienda:", err);
+    res.status(500).json({ message: "Errore server interno" });
+  }
+});
+
+
+
 //AGGIORNA VISUALIZZAZIONI IMMOBILE-----------------------------------------------------------------------------------------
+
 router.post("/immobili/:id/aggiorna-visualizzazioni", async (req, res) => {
   const immobileId = req.params.id;
 
