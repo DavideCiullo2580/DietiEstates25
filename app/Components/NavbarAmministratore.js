@@ -43,7 +43,7 @@ export default function NotLoggedNavBar() {
               alt="DietiEstates25 Logo"
               width={180}
               height={50}
-              className="block flex-shrink-0"
+              className="h-12 w-auto"
             />
             <span className="mt-2 sm:mt-0 sm:ml-4 text-xl font-semibold text-black whitespace-nowrap overflow-hidden text-ellipsis sm:max-w-[300px] text-center sm:text-left">
               {azienda}

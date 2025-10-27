@@ -1,22 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
-import FiltroImmobiliForm from "./FiltroImmobiliForm";
 
 export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili }) {
   const [loading, setLoading] = useState(true);
-  const [showFilter, setShowFilter] = useState(false);
 
-  const [filtri, setFiltri] = useState({
-    tipo_annuncio: "",
-    tipo_immobile: "",
-    prezzoMin: "",
-    prezzoMax: "",
-    stanzeMin: "",
-    classeEnergetica: "",
-    comune: "",
-  });
-
-  const fetchImmobili = async (filtriParam = filtri) => {
+  const fetchImmobili = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
@@ -26,8 +14,7 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
         return;
       }
 
-      const queryParams = new URLSearchParams(filtriParam).toString();
-      const res = await fetch(`http://localhost:8080/posts/immobili/miei?${queryParams}`, {
+      const res = await fetch(`http://localhost:8080/posts/immobili/miei`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -62,32 +49,8 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
 
   return (
     <div>
-      {/* Titolo e pulsante filtri */}
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Immobili</h1>
-        <button
-          type="button"
-          onClick={() => setShowFilter(!showFilter)}
-          className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800 transition"
-        >
-          {showFilter ? "Chiudi Filtri" : "Filtra"}
-        </button>
-      </div>
+      <h1 className="text-2xl font-bold mb-4">Immobili</h1>
 
-      {/* Form filtri */}
-      {showFilter && (
-        <FiltroImmobiliForm
-          filtri={filtri}
-          setFiltri={setFiltri}
-          onApply={(f) => {
-            setFiltri(f);
-            fetchImmobili(f);
-            setShowFilter(false);
-          }}
-        />
-      )}
-
-      {/* Stato caricamento */}
       {loading ? (
         <p className="text-center text-gray-500">Caricamento...</p>
       ) : immobili.length === 0 ? (

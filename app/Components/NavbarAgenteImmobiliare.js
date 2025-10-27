@@ -1,12 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
 
 export default function NavbarAgenteImmobiliare() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [azienda, setAzienda] = useState("");
+
+  useEffect(() => {
+    const fetchAzienda = async () => {
+      try {
+        const token = localStorage.getItem("token"); // Recupera token
+        if (!token) return;
+
+        const res = await fetch("http://localhost:8080/posts/NomeAzienda", {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Errore nel fetch");
+
+        const data = await res.json();
+        setAzienda(data.azienda);
+      } catch (err) {
+        console.error(err);
+        setAzienda("Errore nel caricamento");
+      }
+    };
+
+    fetchAzienda();
+  }, []);
 
   return (
     <nav className="bg-white border-b border-black sticky top-0 z-50">
@@ -18,10 +44,10 @@ export default function NavbarAgenteImmobiliare() {
               alt="DietiEstates25 Logo"
               width={180}
               height={50}
-              className="block flex-shrink-0"
+              className="h-12 w-auto"
             />
             <span className="mt-2 sm:mt-0 sm:ml-4 text-xl font-semibold text-black whitespace-nowrap overflow-hidden text-ellipsis sm:max-w-[300px] text-center sm:text-left">
-              NOME DELLA TUA AZIENDA
+              {azienda || "Caricamento..."}
             </span>
           </Link>
 
@@ -72,4 +98,3 @@ export default function NavbarAgenteImmobiliare() {
     </nav>
   );
 }
- 

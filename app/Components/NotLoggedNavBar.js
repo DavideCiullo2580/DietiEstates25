@@ -19,7 +19,7 @@ export default function NotLoggedNavBar() {
               alt="DietiEstates25 Logo"
               width={180}
               height={50}
-              className="block"
+              className="h-12 w-auto"
             />
           </Link>
 

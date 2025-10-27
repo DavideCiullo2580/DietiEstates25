@@ -18,7 +18,7 @@ export default function NavbarUtente() {
               alt="DietiEstates25 Logo"
               width={180}
               height={50}
-              className="block flex-shrink-0"
+              className="h-12 w-auto"
             />
     
           </Link>

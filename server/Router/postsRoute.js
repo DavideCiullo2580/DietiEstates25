@@ -508,7 +508,6 @@ router.get('/immobili/azienda', authenticateToken, async (req, res) => {
 
     const azienda = aziendaResult.rows[0].azienda;
 
-    // Ora recupero gli immobili degli agenti della stessa azienda
     const result = await pool.query(
       `
       SELECT i.*, img.path AS immagine_url
