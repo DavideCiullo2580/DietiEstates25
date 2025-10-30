@@ -11,7 +11,7 @@ describe('POST /posts/add-agent', () => {
   let creatorToken;
 
   beforeAll(async () => {
-    // crea utente creatore
+
     creator = {
       username: 'creatoreTest',
       password: await bcrypt.hash('password123', 10),
@@ -28,12 +28,11 @@ describe('POST /posts/add-agent', () => {
       [creator.username, creator.password, creator.email, creator.telefono, creator.ruolo, creator.azienda]
     );
 
-    // token JWT
     creatorToken = jwt.sign({ username: creator.username }, JWT_SECRET);
   });
 
   afterAll(async () => {
-    // cancella creatore e eventuali agenti creati
+
     await pool.query('DELETE FROM users WHERE username IN ($1, $2, $3)', ['creatoreTest', 'agente1', 'agente2']);
     await pool.end();
   });
@@ -59,7 +58,7 @@ describe('POST /posts/add-agent', () => {
   });
 
   test('ritorna 400 se username già esistente', async () => {
-    // inseriamo agente già esistente
+
     await pool.query(
       `INSERT INTO users (username, password, email, telefono, ruolo, azienda)
        VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING`,
@@ -84,7 +83,6 @@ describe('POST /posts/add-agent', () => {
     expect(res.status).toBe(201);
     expect(res.body.message).toBe('Agente agente2 registrato con successo.');
 
-    // verifica nel DB
     const result = await pool.query('SELECT * FROM users WHERE username = $1', ['agente2']);
     expect(result.rows.length).toBe(1);
     expect(result.rows[0].ruolo).toBe('agente');

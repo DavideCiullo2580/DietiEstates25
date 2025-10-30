@@ -62,7 +62,6 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
 
   return (
     <div>
-      {/* Titolo e pulsante filtri */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Immobili</h1>
         <button
@@ -74,7 +73,6 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
         </button>
       </div>
 
-      {/* Form filtri */}
       {showFilter && (
         <FiltroImmobiliForm
           filtri={filtri}
@@ -87,7 +85,6 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
         />
       )}
 
-      {/* Stato caricamento */}
       {loading ? (
         <p className="text-center text-gray-500">Caricamento...</p>
       ) : immobili.length === 0 ? (

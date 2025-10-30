@@ -1,10 +1,9 @@
 "use client";
 import dynamic from "next/dynamic";
 import React from "react";
-import L from "leaflet"; // <--- importa Leaflet qui
+import L from "leaflet"; 
 import "leaflet/dist/leaflet.css";
 
-// 👇 FIX per far comparire le icone classiche dei marker
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -13,7 +12,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
-// --- Dynamic imports (Next.js) ---
 const MapContainer = dynamic(
   () => import("react-leaflet").then((mod) => mod.MapContainer),
   { ssr: false }

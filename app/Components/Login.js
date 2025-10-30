@@ -40,7 +40,7 @@ export default function Login() {
         case 'gestore':
           router.push('/HomeGestore');
           break;
-        case 'agente': // qui cambio da 'agente_immobiliare' a 'agente'
+        case 'agente': 
           router.push('/HomeAgenteImmobiliare');
           break;
         default:

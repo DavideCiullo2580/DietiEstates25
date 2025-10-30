@@ -30,7 +30,6 @@ export default function Login() {
         setPec("");
         setTelefono("");
 
-        // Reindirizzamento alla home dopo 1.5 secondi
         setTimeout(() => {
           router.push("/");
         }, 1500);
@@ -48,7 +47,6 @@ export default function Login() {
       <div className="w-full border-t border-black" />
 
       <section className="min-h-screen grid grid-cols-1 md:grid-cols-2">
-        {/* Colonna sinistra */}
         <div
           id="registrazione_azienda"
           className="relative flex items-center justify-center bg-cover bg-center bg-no-repeat px-8 py-16"
@@ -69,7 +67,6 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Colonna destra */}
         <div className="flex items-center justify-center px-6 py-16 bg-white shadow-xl">
           <div className="w-full max-w-md">
             <h2 className="text-3xl font-bold text-black mb-8 text-center">Invia candidatura</h2>

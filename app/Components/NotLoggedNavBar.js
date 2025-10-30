@@ -12,7 +12,6 @@ export default function NotLoggedNavBar() {
     <nav className="bg-white border-b border-black sticky top-0 z-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-20">
-          {/* Logo a sinistra */}
           <Link href="/" className="flex items-center h-full">
             <Image
               src="/dietiestates25-logo.png"
@@ -23,7 +22,6 @@ export default function NotLoggedNavBar() {
             />
           </Link>
 
-          {/* Link per desktop */}
           <ul className="hidden md:flex space-x-6">
             <li>
           <Link href="/" scroll={true} className="text-black hover:text-blue-600">

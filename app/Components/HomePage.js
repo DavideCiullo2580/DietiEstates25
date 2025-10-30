@@ -15,10 +15,8 @@ export default function HomePage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {/* Overlay nero semi-trasparente */}
       <div className="absolute inset-0 bg-black opacity-50 z-0"></div>
 
-      {/* Contenuto principale */}
       <main className="relative z-10 text-white px-6">
         <div className="flex flex-col items-center justify-center min-h-screen text-center -translate-y-8 opacity-0 animate-fadeIn">
           <h1 className="text-5xl font-extrabold leading-tight">

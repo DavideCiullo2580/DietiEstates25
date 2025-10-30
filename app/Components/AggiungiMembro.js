@@ -40,7 +40,7 @@ export default function AggiungiMembro() {
         },
         body: JSON.stringify({
           ...formData,
-          ruolo: formData.ruolo.toLowerCase(), // 🛡️ per sicurezza
+          ruolo: formData.ruolo.toLowerCase(), 
         }),
       });
 

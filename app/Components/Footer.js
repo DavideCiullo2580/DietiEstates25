@@ -4,7 +4,6 @@ export default function Footer() {
   return (
     <footer className="bg-white text-gray-800 py-10 px-6 border-t border-black">
       <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 items-center text-center md:text-left">
-        {/* Testo ispirazionale */}
         <div>
           <h2 className="text-2xl font-semibold mb-2 text-gray-900">DietiEstates25</h2>
           <p className="text-gray-700">
@@ -12,7 +11,6 @@ export default function Footer() {
           </p>
         </div>
 
-        {/* Link social */}
         <div className="flex justify-center md:justify-end space-x-6">
           <a
             href="https://www.instagram.com"
@@ -44,7 +42,6 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Linea e copyright */}
       <div className="mt-8 border-t border-gray-300 pt-4 text-center text-sm text-gray-600">
         © {new Date().getFullYear()} DietiEstates25. Tutti i diritti riservati.
       </div>

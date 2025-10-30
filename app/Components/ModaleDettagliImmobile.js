@@ -7,7 +7,7 @@ export default function ModaleDettagliImmobile({ immobile, onClose }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 max-w-xl w-full shadow-lg relative">
-        {/* Bottone chiudi */}
+
         <button
           onClick={onClose}
           className="absolute top-2 right-2 text-gray-600 hover:text-red-600 text-xl"
@@ -15,17 +15,14 @@ export default function ModaleDettagliImmobile({ immobile, onClose }) {
           &times;
         </button>
 
-        {/* Immagine immobile */}
         <img
           src={immobile.immagine_url || "/placeholder.jpg"}
           alt="Immagine immobile"
           className="w-full h-64 object-cover rounded mb-4"
         />
 
-        {/* Titolo */}
         <h2 className="text-2xl font-bold mb-2">{immobile.tipo_immobile}</h2>
 
-        {/* Dati immobile */}
         <p>
           <strong>📍 Indirizzo:</strong> {immobile.indirizzo}
         </p>
