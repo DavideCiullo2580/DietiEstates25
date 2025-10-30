@@ -1,3 +1,5 @@
+const PDFDocument = require("pdfkit");
+const ExcelJS = require("exceljs");
 const express = require("express");
 const router = express.Router();
 const pool = require("../database");
@@ -420,7 +422,7 @@ router.get("/immobili/tutti", authenticateToken, async (req, res) => {
       prezzoMin,
       prezzoMax,
       stanzeMin,
-      classeEnergetica,
+      classeEnergetica, 
       comune,
     } = req.query;
 
@@ -494,9 +496,8 @@ router.get("/immobili/tutti", authenticateToken, async (req, res) => {
 
 router.get('/immobili/azienda', authenticateToken, async (req, res) => {
   try {
-    const username = req.user.username; // prendo lo username dal token
+    const username = req.user.username; 
 
-    // Recupero l'azienda dal DB
     const aziendaResult = await pool.query(
       'SELECT azienda FROM users WHERE username = $1',
       [username]
@@ -540,8 +541,6 @@ router.get('/immobili/azienda', authenticateToken, async (req, res) => {
   }
 });
 
-
-
 //AGGIORNA VISUALIZZAZIONI IMMOBILE-----------------------------------------------------------------------------------------
 
 router.post("/immobili/:id/aggiorna-visualizzazioni", async (req, res) => {
@@ -571,7 +570,6 @@ router.get("/DashboardImmobili", authenticateToken, async (req, res) => {
   try {
     const agenteUsername = req.user.username;
 
-    // Recupera gli immobili dell'agente con una immagine associata (se esiste)
     const result = await pool.query(
       `
       SELECT i.*, img.path AS immagine_url
@@ -601,5 +599,112 @@ router.get("/DashboardImmobili", authenticateToken, async (req, res) => {
   }
 });
 
+//ESPORTAZIONE PDF---------------------------------------------------------------------------------------------------------
 
+router.get("/DashboardImmobili/pdf", authenticateToken, async (req, res) => {
+  try {
+    const agenteUsername = req.user.username;
+
+    const result = await pool.query(`
+      SELECT i.*, img.path AS immagine_url
+      FROM immobili i
+      LEFT JOIN (
+          SELECT DISTINCT ON (immobile_id) immobile_id, path
+          FROM immagini_immobile
+          ORDER BY immobile_id, id ASC
+      ) img ON i.id = img.immobile_id
+      WHERE i.agente_id = $1
+      ORDER BY i.created_at DESC
+    `, [agenteUsername]);
+
+    const immobili = result.rows;
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", 'attachment; filename="report_immobili.pdf"');
+
+    const doc = new PDFDocument({ margin: 40 });
+    doc.pipe(res);
+
+    doc.fontSize(20).text("Report Immobili", { align: "center" });
+    doc.moveDown(1);
+
+    immobili.forEach((i, idx) => {
+      doc.fontSize(12).text(`Immobile #${idx + 1}`, { underline: true });
+      doc.text(`Tipo annuncio: ${i.tipo_annuncio || "N/D"}`);
+      doc.text(`Tipo immobile: ${i.tipo_immobile || "N/D"}`);
+      doc.text(`Prezzo: € ${i.prezzo || "N/D"}`);
+      doc.text(`Dimensioni: ${i.dimensioni || "N/D"} m²`);
+      doc.text(`Stanze: ${i.stanze || "N/D"}`);
+      doc.text(`Piano: ${i.piano || "N/D"}`);
+      doc.text(`Indirizzo: ${i.indirizzo || "N/D"}`);
+      doc.text(`Classe energetica: ${i.classe_energetica || "N/D"}`);
+      doc.text(`Descrizione: ${i.descrizione || "N/D"}`);
+      doc.text(`Servizi: ${i.servizi || "N/D"}`);
+      doc.text(`Comune: ${i.comune || "N/D"}`);
+      doc.moveDown(1);
+    });
+
+    doc.end();
+  } catch (err) {
+    console.error("Errore export PDF:", err);
+    res.status(500).json({ error: "Errore durante l’esportazione del PDF" });
+  }
+});
+
+//ESPORTAZIONE EXCEL---------------------------------------------------------------------------------------------------------
+
+router.get("/DashboardImmobili/excel", authenticateToken, async (req, res) => {
+  try {
+    const agenteUsername = req.user.username;
+
+    const result = await pool.query(`
+      SELECT i.*, img.path AS immagine_url
+      FROM immobili i
+      LEFT JOIN (
+          SELECT DISTINCT ON (immobile_id) immobile_id, path
+          FROM immagini_immobile
+          ORDER BY immobile_id, id ASC
+      ) img ON i.id = img.immobile_id
+      WHERE i.agente_id = $1
+      ORDER BY i.created_at DESC
+    `, [agenteUsername]);
+
+    const immobili = result.rows;
+
+    const ExcelJS = require("exceljs");
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("Immobili");
+
+    sheet.columns = [
+      { header: "Tipo annuncio", key: "tipo_annuncio", width: 15 },
+      { header: "Tipo immobile", key: "tipo_immobile", width: 20 },
+      { header: "Prezzo (€)", key: "prezzo", width: 15 },
+      { header: "Dimensioni (m²)", key: "dimensioni", width: 15 },
+      { header: "Stanze", key: "stanze", width: 10 },
+      { header: "Piano", key: "piano", width: 10 },
+      { header: "Indirizzo", key: "indirizzo", width: 30 },
+      { header: "Classe energetica", key: "classe_energetica", width: 20 },
+      { header: "Descrizione", key: "descrizione", width: 30 },
+      { header: "Servizi", key: "servizi", width: 30 },
+      { header: "Comune", key: "comune", width: 20 },
+    ];
+
+    immobili.forEach((i) => sheet.addRow(i));
+
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="report_immobili.xlsx"'
+    );
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (err) {
+    console.error("Errore export Excel:", err);
+    res.status(500).json({ error: "Errore durante l’esportazione dell’Excel" });
+  }
+});
 module.exports = router;
