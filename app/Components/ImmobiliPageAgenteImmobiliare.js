@@ -14,8 +14,8 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
         return;
       }
 
-      const res = await fetch(`http://localhost:8080/posts/immobili/miei`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await fetch("http://localhost:8080/posts/immobili/agente", {
+        headers: { Authorization: "Bearer " + token },
       });
 
       if (!res.ok) throw new Error("Errore nel caricamento immobili");
@@ -29,19 +29,6 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
     }
   };
 
-  const aggiornaVisualizzazioni = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      await fetch(`http://localhost:8080/posts/immobili/${id}/aggiorna-visualizzazioni`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      });
-    } catch (err) {
-      console.error("Errore aggiornamento visualizzazioni:", err);
-    }
-  };
 
   useEffect(() => {
     fetchImmobili();
@@ -72,7 +59,6 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
 
               <button
                 onClick={() => {
-                  aggiornaVisualizzazioni(immobile.id);
                   onSelectImmobile(immobile);
                 }}
                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"

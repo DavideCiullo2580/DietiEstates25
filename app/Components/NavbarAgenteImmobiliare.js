@@ -47,7 +47,7 @@ export default function NavbarAgenteImmobiliare() {
               className="h-12 w-auto"
             />
             <span className="mt-2 sm:mt-0 sm:ml-4 text-xl font-semibold text-black whitespace-nowrap overflow-hidden text-ellipsis sm:max-w-[300px] text-center sm:text-left">
-              {azienda || "Caricamento..."}
+              {azienda}
             </span>
           </Link>
 

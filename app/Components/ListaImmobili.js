@@ -107,6 +107,25 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
               <p className="text-gray-700 mb-1">💶 €{immobile.prezzo}</p>
               <p className="text-gray-700 mb-3">📐 {immobile.dimensioni} mq</p>
 
+              {/* Indicatori di vicinanza */}
+              <div className="flex flex-wrap gap-2 mb-3">
+                {immobile.vicino_scuole && (
+                  <span className="bg-green-500 text-white text-xs px-2 py-1 rounded">
+                    Vicino a scuole
+                  </span>
+                )}
+                {immobile.vicino_parchi && (
+                  <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                  🌳  Vicino a parchi
+                  </span>
+                )}
+                {immobile.vicino_trasporti && (
+                  <span className="bg-orange-500 text-white text-xs px-2 py-1 rounded">
+                  🚌  Vicino a trasporto pubblico
+                  </span>
+                )}
+              </div>
+
               <button
                 onClick={() => {
                   aggiornaVisualizzazioni(immobile.id);
@@ -117,6 +136,7 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
                 Visualizza dettagli
               </button>
             </div>
+
           ))}
         </div>
       )}
