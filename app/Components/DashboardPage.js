@@ -112,9 +112,9 @@ export default function DashboardPage() {
         </p>
       ) : (
         <div className="max-w-4xl mx-auto flex flex-col gap-6">
-          {immobili.map((immobile) => (
+          {immobili.map((immobile, index) => (
             <div
-              key={immobile.id}
+              key={immobile.id ?? index}
               className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col"
             >
               <div className="w-full h-48">
