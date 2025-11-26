@@ -52,7 +52,7 @@ const handleSubmit = async (e) => {
 
   const token = localStorage.getItem("token");
   if (!token) {
-    alert("Utente non autenticato. Effettua il login.");
+    showMessage("Utente non autenticato. Effettua il login.");
     return;
   }
 
@@ -170,6 +170,7 @@ const handleSubmit = async (e) => {
                 <label className="block font-semibold mb-1">Prezzo (€)</label>
                 <input
                   type="number"
+                  min={0}
                   className="w-full p-2 border border-gray-300"
                   value={prezzo}
                   onChange={(e) => setPrezzo(e.target.value)}
@@ -180,6 +181,7 @@ const handleSubmit = async (e) => {
                 <label className="block font-semibold mb-1">Dimensioni (mq)</label>
                 <input
                   type="number"
+                  max={0}
                   className="w-full p-2 border border-gray-300"
                   value={dimensioni}
                   onChange={(e) => setDimensioni(e.target.value)}
@@ -190,6 +192,7 @@ const handleSubmit = async (e) => {
                 <label className="block font-semibold mb-1">Stanze</label>
                 <input
                   type="number"
+                  min={0}
                   className="w-full p-2 border border-gray-300"
                   value={stanze}
                   onChange={(e) => setStanze(e.target.value)}
@@ -200,6 +203,7 @@ const handleSubmit = async (e) => {
                 <label className="block font-semibold mb-1">Piano</label>
                 <input
                   type="number"
+                  min={0}
                   className="w-full p-2 border border-gray-300"
                   value={piano}
                   onChange={(e) => setPiano(e.target.value)}

@@ -15,6 +15,7 @@ export default function HomePage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      
       <div className="absolute inset-0 bg-black opacity-50 z-0"></div>
 
       <main className="relative z-10 text-white px-6">

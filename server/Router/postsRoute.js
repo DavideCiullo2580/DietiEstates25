@@ -333,11 +333,33 @@ router.post("/immobili", authenticateToken, upload.array('immagini'), async (req
     const lat = geoData.features[0].properties.lat;
     const lng = geoData.features[0].properties.lon;
 
-  
-    const result = await pool.query(
+
+    const placesUrl = `https://api.geoapify.com/v2/places?categories=education.school,leisure.park,public_transport&filter=circle:${lng},${lat},600&apiKey=${apiKey}`;
+
+    const placesRes = await fetch(placesUrl);
+    const placesData = await placesRes.json();
+
+    let vicino_scuole = false;
+    let vicino_parchi = false;
+    let vicino_trasporti = false;
+
+    if (placesData?.features.length > 0) {
+      for (const p of placesData.features) {
+        const cat = p.properties.categories;
+
+        if (cat.includes("education.school")) vicino_scuole = true;
+        if (cat.includes("leisure.park")) vicino_parchi = true;
+        if (cat.includes("public_transport")) vicino_trasporti = true;
+      }
+    }
+
+
+      const result = await pool.query(
       `INSERT INTO immobili 
-        (tipo_annuncio, tipo_immobile, prezzo, dimensioni, stanze, piano, indirizzo, classe_energetica, descrizione, servizi, agente_id, comune, lat, lng) 
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *`,
+        (tipo_annuncio, tipo_immobile, prezzo, dimensioni, stanze, piano, indirizzo, classe_energetica, descrizione, servizi, agente_id, comune, lat, lng,
+         vicino_scuole, vicino_parchi, vicino_trasporti)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
+        RETURNING *`,
       [
         tipoAnnuncio,
         tipoImmobile,
@@ -352,11 +374,15 @@ router.post("/immobili", authenticateToken, upload.array('immagini'), async (req
         agenteUsername,
         comune,
         lat,
-        lng
+        lng,
+        vicino_scuole,
+        vicino_parchi,
+        vicino_trasporti
       ]
     );
 
     const immobileId = result.rows[0].id;
+
 
     
     if (req.files && req.files.length > 0) {
@@ -378,7 +404,7 @@ router.post("/immobili", authenticateToken, upload.array('immagini'), async (req
 
 
 // VISUALIZZA IMMOBILI DELL'AGENTE-----------------------------------------------------------------------------------------
-router.get("/immobili/miei", authenticateToken, async (req, res) => {
+router.get("/immobili/agente", authenticateToken, async (req, res) => {
   const agenteUsername = req.user.username;
 
   try {
@@ -407,7 +433,7 @@ router.get("/immobili/miei", authenticateToken, async (req, res) => {
 
     res.json(immobili);
   } catch (err) {
-    console.error("Errore nella route /immobili/miei:", err); 
+    console.error("Errore nella route /immobili/agente:", err); 
     res.status(500).json({ message: "Errore nel recupero immobili" });
   }
 });

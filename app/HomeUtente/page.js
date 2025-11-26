@@ -8,9 +8,27 @@ import ModaleDettagliImmobile from "../Components/ModaleDettagliImmobile";
 
 const MappaImmobili = dynamic(() => import("../Components/MappaImmobili"), { ssr: false });
 
-export default function ImmobiliPageGestore() {
+export default function HomeUtente() {
   const [immobili, setImmobili] = useState([]);
   const [immobileSelezionato, setImmobileSelezionato] = useState(null);
+
+
+  const aggiornaVisualizzazioni = async (id) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    await fetch(`http://localhost:8080/posts/immobili/${id}/aggiorna-visualizzazioni`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (err) {
+    console.error("Errore aggiornamento visualizzazioni:", err);
+  }
+};
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200">
@@ -31,7 +49,10 @@ export default function ImmobiliPageGestore() {
           <ListaImmobili
             immobili={immobili}
             setImmobili={setImmobili}
-            onSelectImmobile={setImmobileSelezionato}
+            onSelectImmobile={(immobile) => {
+              aggiornaVisualizzazioni(immobile.id);
+              setImmobileSelezionato(immobile);
+            }}
           />
         </div>
 
@@ -39,7 +60,10 @@ export default function ImmobiliPageGestore() {
           <MappaImmobili
             immobili={immobili}
             immobileSelezionato={immobileSelezionato}
-            onSelectImmobile={setImmobileSelezionato}
+            onSelectImmobile={(immobile) => {
+              aggiornaVisualizzazioni(immobile.id);
+              setImmobileSelezionato(immobile);
+            }}
           />
         </div>
       </main>
