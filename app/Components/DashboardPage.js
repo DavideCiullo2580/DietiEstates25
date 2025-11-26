@@ -70,9 +70,9 @@ export default function DashboardPage() {
     }
   };
 
-  const badgeColor = (views) => {
-    if (views < 100) return "bg-green-200 text-green-800";
-    if (views < 500) return "bg-yellow-200 text-yellow-800";
+  const badgeColor = (value) => {
+    if (value < 10) return "bg-green-200 text-green-800";
+    if (value < 50) return "bg-yellow-200 text-yellow-800";
     return "bg-red-200 text-red-800";
   };
 
@@ -133,16 +133,16 @@ export default function DashboardPage() {
                       immobile.visualizzazioni || 0
                     )}`}
                   >
-                    {immobile.visualizzazioni?.toLocaleString("it-IT") || 0}
+                    {immobile.visualizzazioni?.toLocaleString("it-IT") || 0} 👁️
                   </span>
                 </h2>
+
                 <p>
                   <strong>Prezzo:</strong> €{" "}
                   {Number(immobile.prezzo || 0).toLocaleString("it-IT")}
                 </p>
                 <p>
-                  <strong>Dimensioni:</strong>{" "}
-                  {immobile.dimensioni || "N/D"} m²
+                  <strong>Dimensioni:</strong> {immobile.dimensioni || "N/D"} m²
                 </p>
                 <p>
                   <strong>Stanze:</strong> {immobile.stanze || "N/D"}
@@ -161,8 +161,17 @@ export default function DashboardPage() {
                   <strong>Comune:</strong> {immobile.comune || "N/D"}
                 </p>
                 <p className="col-span-2">
-                  <strong>Descrizione:</strong>{" "}
-                  {immobile.descrizione || "N/D"}
+                  <strong>Descrizione:</strong> {immobile.descrizione || "N/D"}
+                </p>
+                <p className="col-span-2">
+                  <strong>Prenotazioni:</strong>{" "}
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-sm font-semibold ${badgeColor(
+                      immobile.visite_prenotate || 0
+                    )}`}
+                  >
+                    {immobile.visite_prenotate || 0} 📅
+                  </span>
                 </p>
               </div>
             </div>

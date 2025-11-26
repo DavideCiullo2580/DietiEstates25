@@ -181,7 +181,7 @@ const handleSubmit = async (e) => {
                 <label className="block font-semibold mb-1">Dimensioni (mq)</label>
                 <input
                   type="number"
-                  max={0}
+                  min={0}
                   className="w-full p-2 border border-gray-300"
                   value={dimensioni}
                   onChange={(e) => setDimensioni(e.target.value)}
