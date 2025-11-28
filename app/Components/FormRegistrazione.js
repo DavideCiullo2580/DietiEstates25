@@ -11,12 +11,12 @@ export default function SignUpForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState(null);
-  const [error, setError] = useState(null);
+  const [messageType, setMessageType] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage(null);
-    setError(null);
+    setMessageType(null);
 
     try {
       const res = await fetch("http://localhost:8080/posts/register", {
@@ -34,10 +34,12 @@ export default function SignUpForm() {
         setPassword("");
         router.push("/"); 
       } else {
-        setError(data.error || "Errore durante la registrazione");
+        setMessage(data.error || "Errore durante la registrazione");
+        setMessageType("error");
       }
     } catch (err) {
-      setError("Errore di connessione al server");
+      setMessage("Errore di connessione al server");
+      setMessageType("error");
     }
   };
 
@@ -138,9 +140,14 @@ export default function SignUpForm() {
           </form>
 
           {message && (
-            <p className="mt-4 text-center text-green-600">{message}</p>
+            <p
+              className={`mt-4 text-center font-semibold ${
+                messageType === "success" ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {message}
+            </p>
           )}
-          {error && <p className="mt-4 text-center text-red-600">{error}</p>}
 
           <div className="mt-8">
             <p className="text-center text-sm text-gray-500 mb-4">

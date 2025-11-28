@@ -3,13 +3,16 @@ import { useEffect, useState } from "react";
 
 export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili }) {
   const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState(null);
+  const [messageType, setMessageType] = useState(null);
 
   const fetchImmobili = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("Utente non autenticato. Effettua il login.");
+        setMessage("Utente non autenticato. Effettua il login.");
+        setMessageType("error");
         setLoading(false);
         return;
       }
@@ -24,6 +27,8 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
       setImmobili(data);
     } catch (err) {
       console.error("Errore:", err);
+      setMessage("Errore durante il caricamento degli immobili.");
+      setMessageType("error");
     } finally {
       setLoading(false);
     }
@@ -37,6 +42,16 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Immobili</h1>
+
+      {message && (
+        <p
+          className={`mt-4 text-center font-semibold ${
+            messageType === "success" ? "text-green-600" : "text-red-600"
+          }`}
+        >
+          {message}
+        </p>
+      )}
 
       {loading ? (
         <p className="text-center text-gray-500">Caricamento...</p>

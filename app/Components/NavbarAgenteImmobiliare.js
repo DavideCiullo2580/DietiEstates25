@@ -4,15 +4,17 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
+import ModaleLogout from "../Components/ModaleLogout";
 
 export default function NavbarAgenteImmobiliare() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [azienda, setAzienda] = useState("");
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     const fetchAzienda = async () => {
       try {
-        const token = localStorage.getItem("token"); // Recupera token
+        const token = localStorage.getItem("token");
         if (!token) return;
 
         const res = await fetch("http://localhost:8080/posts/NomeAzienda", {
@@ -34,7 +36,16 @@ export default function NavbarAgenteImmobiliare() {
     fetchAzienda();
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setShowLogoutModal(false);
+    setMenuOpen(false);
+
+    window.location.href = "/";
+  };
+
   return (
+    <>
     <nav className="bg-white border-b border-black sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between min-h-[7rem] sm:min-h-[5rem]">
@@ -47,7 +58,7 @@ export default function NavbarAgenteImmobiliare() {
               className="h-12 w-auto"
             />
             <span className="mt-2 sm:mt-0 sm:ml-4 text-xl font-semibold text-black whitespace-nowrap overflow-hidden text-ellipsis sm:max-w-[300px] text-center sm:text-left">
-              {azienda}
+              {azienda || "Caricamento..."}
             </span>
           </Link>
 
@@ -83,18 +94,23 @@ export default function NavbarAgenteImmobiliare() {
                 >
                   Dashboard Immobili
                 </Link>
-                <Link
-                  href="/"
-                  className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
-                  onClick={() => setMenuOpen(false)}
-                >
+                <button
+                  onClick={() => setShowLogoutModal(true)}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
+                  >
                   Log out
-                </Link>
+                  </button>
               </div>
             )}
           </div>
         </div>
       </div>
     </nav>
+    <ModaleLogout
+      visible={showLogoutModal}
+      onConfirm={handleLogout}
+      onCancel={() => setShowLogoutModal(false)}
+    />  
+     </>
   );
 }

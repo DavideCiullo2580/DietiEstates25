@@ -8,7 +8,7 @@ import ModaleDettagliImmobile from "../Components/ModaleDettagliImmobile";
 
 const MappaImmobili = dynamic(() => import("../Components/MappaImmobili"), { ssr: false });
 
-export default function ImmobiliPageGestore() {
+export default function HomeGestore() {
   const [immobili, setImmobili] = useState([]);
   const [immobileSelezionato, setImmobileSelezionato] = useState(null);
 

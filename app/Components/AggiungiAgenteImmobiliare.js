@@ -9,7 +9,8 @@ export default function AggiungiAgenteImmobiliare() {
     confermaPassword: "",
   });
 
-  const [feedback, setFeedback] = useState(null); 
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,16 +18,18 @@ export default function AggiungiAgenteImmobiliare() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setFeedback(null);
+    setMessage("");
 
     if (formData.password !== formData.confermaPassword) {
-      setFeedback({ type: "error", message: "Le password non corrispondono." });
+      setMessage("Le password non corrispondono.");
+      setMessageType("error");
       return;
     }
 
     const token = localStorage.getItem("token");
     if (!token) {
-      setFeedback({ type: "error", message: "Utente non autenticato." });
+      setMessage("Utente non autenticato.");
+      setMessageType("error");
       return;
     }
 
@@ -48,9 +51,11 @@ export default function AggiungiAgenteImmobiliare() {
       const data = await res.json();
 
       if (!res.ok) {
-        setFeedback({ type: "error", message: data.error || "Errore durante la registrazione." });
+        setMessage(data.error || "Errore durante la registrazione.");
+        setMessageType("error");
       } else {
-        setFeedback({ type: "success", message: data.message || "Agente aggiunto con successo!" });
+        setMessage(data.message || "Agente aggiunto con successo!");
+        setMessageType("success");
         setFormData({
           nome: "",
           email: "",
@@ -59,7 +64,8 @@ export default function AggiungiAgenteImmobiliare() {
         });
       }
     } catch (err) {
-      setFeedback({ type: "error", message: "Errore di connessione con il server." });
+      setMessage("Errore di connessione con il server.");
+      setMessageType("error");
     }
   };
 
@@ -74,15 +80,6 @@ export default function AggiungiAgenteImmobiliare() {
       >
         <h2 className="text-2xl font-bold mb-4 text-center">Aggiungi agente immobiliare</h2>
 
-        {feedback && (
-          <div
-            className={`text-sm text-center p-2 rounded ${
-              feedback.type === "error" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
-            }`}
-          >
-            {feedback.message}
-          </div>
-        )}
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Nome</label>
@@ -130,7 +127,17 @@ export default function AggiungiAgenteImmobiliare() {
             required
             className="mt-1 block w-full border border-gray-300 rounded-md p-2"
           />
+          
         </div>
+        {message && (
+           <p
+            className={`text-sm text-center ${
+              messageType === "success" ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {message}
+          </p>
+        )}
 
         <button
           type="submit"

@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 export default function DashboardPage() {
   const [immobili, setImmobili] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState("");
+    const [message, setMessage] = useState("");
+    const [messageType, setMessageType] = useState("");
 
   useEffect(() => {
     async function fetchImmobili() {
@@ -18,8 +19,9 @@ export default function DashboardPage() {
         setImmobili(data.immobili || []);
       } catch (err) {
         console.error("Errore nel recupero immobili:", err);
-        setErrorMsg("Errore nel caricamento degli immobili.");
-      } finally {
+        setMessage("Errore nel caricamento degli immobili.");
+        setMessageType("error");      } 
+        finally {
         setLoading(false);
       }
     }
@@ -28,7 +30,7 @@ export default function DashboardPage() {
 
   const handleExportPDF = async () => {
     try {
-      setErrorMsg("");
+      setMessage("");
       const token = localStorage.getItem("token");
       const res = await fetch("http://localhost:8080/posts/DashboardImmobili/pdf", {
         headers: { Authorization: `Bearer ${token}` },
@@ -42,15 +44,18 @@ export default function DashboardPage() {
       a.download = "report_immobili.pdf";
       a.click();
       window.URL.revokeObjectURL(url);
+      setMessage("PDF esportato con successo!");
+      setMessageType("success");
     } catch (err) {
       console.error(err);
-      setErrorMsg("Errore durante l’esportazione del PDF.");
+      setMessage("Errore durante l’esportazione del PDF.");
+      setMessageType("error");
     }
   };
 
   const handleExportExcel = async () => {
     try {
-      setErrorMsg("");
+      setMessage("");
       const token = localStorage.getItem("token");
       const res = await fetch("http://localhost:8080/posts/DashboardImmobili/excel", {
         headers: { Authorization: `Bearer ${token}` },
@@ -64,9 +69,13 @@ export default function DashboardPage() {
       a.download = "report_immobili.xlsx";
       a.click();
       window.URL.revokeObjectURL(url);
+
+      setMessage("Excel esportato con successo!");
+      setMessageType("success");
     } catch (err) {
       console.error(err);
-      setErrorMsg("Errore durante l’esportazione dell’Excel.");
+      setMessage("Errore durante l’esportazione dell’Excel.");
+      setMessageType("error");
     }
   };
 
@@ -100,8 +109,14 @@ export default function DashboardPage() {
         </button>
       </div>
 
-      {errorMsg && (
-        <p className="text-center text-red-600 font-semibold mb-4">{errorMsg}</p>
+      {message && (
+        <p
+          className={`text-center font-semibold mb-4 ${
+            messageType === "success" ? "text-green-600" : "text-red-600"
+          }`}
+        >
+          {message}
+        </p>
       )}
 
       {loading ? (

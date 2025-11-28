@@ -1,22 +1,25 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
+import ModaleLogout from "../Components/ModaleLogout";
 
-export default function NotLoggedNavBar() {
+export default function NavBarAmministratore() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [azienda, setAzienda] = useState("Caricamento...");
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     async function fetchUser() {
       try {
-        const token = localStorage.getItem("token"); // o dove salvi il token
+        const token = localStorage.getItem("token");
         if (!token) {
           setAzienda("Ospite");
           return;
         }
 
-        // Fai una chiamata al backend per ottenere i dati utente, compresa l'azienda
         const res = await fetch("http://localhost:8080/posts/NomeAzienda", { 
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -33,7 +36,15 @@ export default function NotLoggedNavBar() {
     fetchUser();
   }, []);
 
+    const handleLogout = () => {
+    localStorage.removeItem("token");
+    setShowLogoutModal(false);
+    setMenuOpen(false);
+    window.location.href = "/";
+  };
+
   return (
+    <>
     <nav className="bg-white border-b border-black sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between min-h-[7rem] sm:min-h-[5rem]">
@@ -95,5 +106,13 @@ export default function NotLoggedNavBar() {
         </div>
       </div>
     </nav>
+
+    <ModaleLogout
+      visible={showLogoutModal}
+      onConfirm={handleLogout}
+      onCancel={() => setShowLogoutModal(false)}
+    /> 
+    </> 
+
   );
 }

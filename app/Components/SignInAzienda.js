@@ -7,13 +7,13 @@ export default function Login() {
   const [societa, setSocieta] = useState("");
   const [pec, setPec] = useState("");
   const [telefono, setTelefono] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [message, setMessage] = useState(""); 
+  const [messageType, setMessageType] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSuccessMessage("");
-    setErrorMessage("");
+    setMessage("");
+    setMessageType("");
 
     try {
       const response = await fetch("http://localhost:8080/posts/register-agency", {
@@ -25,7 +25,8 @@ export default function Login() {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccessMessage("Richiesta inviata con successo. Controlla la PEC per la password.");
+        setMessage("Richiesta inviata con successo. Controlla la PEC per la password.");
+        setMessageType("success");
         setSocieta("");
         setPec("");
         setTelefono("");
@@ -34,11 +35,13 @@ export default function Login() {
           router.push("/");
         }, 1500);
       } else {
-        setErrorMessage(data.error || "Errore durante la registrazione.");
+        setMessage(data.error || "Errore durante l'invio della richiesta.");
+        setMessageType("error");
       }
     } catch (err) {
       console.error("Errore invio:", err);
-      setErrorMessage("Errore server.");
+      setMessage("Errore server.");
+      setMessageType("error");
     }
   };
 
@@ -123,9 +126,17 @@ export default function Login() {
               >
                 Invia richiesta
               </button>
+    
+            {message && (
+                <p
+                  className={`mt-2 text-sm text-center font-medium ${
+                    messageType === "success" ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {message}
+                </p>
+              )}
 
-              {successMessage && <p className="text-green-600 text-sm mt-2">{successMessage}</p>}
-              {errorMessage && <p className="text-red-600 text-sm mt-2">{errorMessage}</p>}
             </form>
           </div>
         </div>

@@ -36,32 +36,33 @@ export default function MappaImmobili({
 }) {
   return (
     <MapContainer
-      center={[41.9028, 12.4964]}
-      zoom={6}
-      style={{ height: "100%", width: "100%" }}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      />
+  center={immobileSelezionato ? [immobileSelezionato.lat, immobileSelezionato.lng] : [41.9028, 12.4964]}
+  zoom={6}
+  style={{ height: "100%", width: "100%" }}
+>
+  <TileLayer
+    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  />
 
-      {immobili.map((immobile) =>
-        immobile.lat && immobile.lng ? (
-          <Marker
-            key={immobile.id}
-            position={[immobile.lat, immobile.lng]}
-            eventHandlers={{
-              click: () => onSelectImmobile(immobile),
-            }}
-          >
-            <Popup>
-              <strong>{immobile.tipo_immobile}</strong>
-              <br />
-              {immobile.prezzo} €
-            </Popup>
-          </Marker>
-        ) : null
-      )}
-    </MapContainer>
+  {immobili?.map((immobile) =>
+    immobile.lat && immobile.lng ? (
+      <Marker
+        key={immobile.id}
+        position={[immobile.lat, immobile.lng]}
+        eventHandlers={{
+          click: () => onSelectImmobile(immobile),
+        }}
+      >
+        <Popup>
+          <strong>{immobile.tipo_immobile}</strong>
+          <br />
+          {immobile.prezzo} €
+        </Popup>
+      </Marker>
+    ) : null
+  )}
+</MapContainer>
+
   );
 }

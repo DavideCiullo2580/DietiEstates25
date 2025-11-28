@@ -11,7 +11,8 @@ export default function AggiungiMembro() {
     ruolo: "agente",
   });
 
-  const [feedback, setFeedback] = useState(null);
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,14 +22,16 @@ export default function AggiungiMembro() {
     e.preventDefault();
 
     if (formData.password !== formData.confermaPassword) {
-      setFeedback({ type: "error", message: "Le password non corrispondono." });
+      setMessage("Le password non corrispondono.");
+      setMessageType("error");      
       return;
     }
 
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        setFeedback({ type: "error", message: "Utente non autenticato." });
+        setMessage("Utente non autenticato.");
+        setMessageType("error");        
         return;
       }
 
@@ -47,9 +50,12 @@ export default function AggiungiMembro() {
       const data = await res.json();
 
       if (!res.ok) {
-        setFeedback({ type: "error", message: data.error || "Errore imprevisto." });
+              setMessage(data.error || "Errore imprevisto.");
+              setMessageType("error");
       } else {
-        setFeedback({ type: "success", message: data.message });
+        setMessage(data.message);
+        setMessageType("success");
+
         setFormData({
           nome: "",
           email: "",
@@ -59,7 +65,8 @@ export default function AggiungiMembro() {
         });
       }
     } catch (err) {
-      setFeedback({ type: "error", message: "Errore di rete o server non raggiungibile." });
+      setMessage("Errore di rete o server non raggiungibile.");
+      setMessageType("error");
     }
   };
 
@@ -74,13 +81,13 @@ export default function AggiungiMembro() {
       >
         <h2 className="text-2xl font-bold text-center mb-4">Aggiungi Membro</h2>
 
-        {feedback && (
+        {message && (
           <div
             className={`text-sm text-center p-2 rounded ${
-              feedback.type === "error" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
+              messageType === "error" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
             }`}
           >
-            {feedback.message}
+            {message}
           </div>
         )}
 

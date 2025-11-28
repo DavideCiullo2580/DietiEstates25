@@ -7,21 +7,23 @@ export default function CambiaPasswordAmministratore() {
   const [nuovaPassword, setNuovaPassword] = useState("");
   const [ripetiPassword, setRipetiPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [messageType, setMessageType] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
-    setError("");
+    setMessageType("");
 
     if (nuovaPassword !== ripetiPassword) {
-      setError("Le nuove password non coincidono.");
+      setMessage("Le nuove password non coincidono.");
+      setMessageType("error");
       return;
     }
 
     const token = localStorage.getItem("token");
     if (!token) {
-      setError("Utente non autenticato. Effettua il login.");
+      setMessage("Utente non autenticato.");
+      setMessageType("error");
       return;
     }
 
@@ -39,14 +41,17 @@ export default function CambiaPasswordAmministratore() {
 
       if (response.ok) {
         setMessage(data.message);
+        setMessageType("success");
         setVecchiaPassword("");
         setNuovaPassword("");
         setRipetiPassword("");
       } else {
-        setError(data.error || "Errore durante il cambio password.");
+        setMessage(data.error || "Errore durante il cambio password.");
+        setMessageType("error");
       }
     } catch (err) {
-      setError("Errore di connessione al server.");
+      setMessage("Errore di connessione al server.");
+      setMessageType("error");
     }
   };
 
@@ -98,8 +103,15 @@ export default function CambiaPasswordAmministratore() {
           Cambia Password
         </button>
 
-        {message && <p className="text-green-600 text-sm text-center">{message}</p>}
-        {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+         {message && (
+          <p
+            className={`text-sm text-center ${
+              messageType === "success" ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {message}
+          </p>
+        )}
       </form>
     </div>
   );

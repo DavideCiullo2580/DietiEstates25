@@ -7,11 +7,13 @@ export default function Login() {
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [messageType, setMessageType] = useState(null);
 
   const handleSubmit = async (e) => { 
     e.preventDefault();
-    setError(null);
+    setMessage(null);
+    setMessageType(null);
     try {
       const res = await fetch('http://localhost:8080/posts/login', {
         method: 'POST',
@@ -22,7 +24,8 @@ export default function Login() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Errore durante il login');
+        setMessage(data.error || 'Errore durante il login');
+        setMessageType("error");
         return;
       }
 
@@ -50,7 +53,8 @@ export default function Login() {
 
 
     } catch (error) {
-      setError('Errore di rete o server');
+      setMessage('Errore di rete o server');
+      setMessageType('error');    
     }
   };
 
@@ -130,8 +134,14 @@ export default function Login() {
               </button>
             </form>
 
-            {error && (
-              <p className="mt-4 text-center text-sm text-red-600">{error}</p>
+            {message && (
+              <p
+                className={`mt-4 text-center font-semibold ${
+                  messageType === 'success' ? 'text-green-600' : 'text-red-600'
+                }`}
+              >
+                {message}
+              </p>
             )}
 
             <p className="mt-6 text-center text-sm text-gray-600">
