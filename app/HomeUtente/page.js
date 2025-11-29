@@ -3,7 +3,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import NavbarUtente from "../Components/NavbarUtente";
 import Footer from "../Components/Footer";
-import ListaImmobili from "../Components/ListaImmobili";
+import ListaImmobili from "../Components/ListaImmobiliUtente";
 import ModaleDettagliImmobile from "../Components/ModaleDettagliImmobile";
 
 const MappaImmobili = dynamic(() => import("../Components/MappaImmobili"), { ssr: false });
@@ -50,9 +50,9 @@ export default function HomeUtente() {
             immobili={immobili}
             setImmobili={setImmobili}
             onSelectImmobile={(immobile) => {
-              aggiornaVisualizzazioni(immobile.id);
               setImmobileSelezionato(immobile);
             }}
+            aggiornaVisualizzazioni={aggiornaVisualizzazioni}
           />
         </div>
 
@@ -61,9 +61,9 @@ export default function HomeUtente() {
             immobili={immobili}
             immobileSelezionato={immobileSelezionato}
             onSelectImmobile={(immobile) => {
-              aggiornaVisualizzazioni(immobile.id);
               setImmobileSelezionato(immobile);
             }}
+            aggiornaVisualizzazioni={aggiornaVisualizzazioni}
           />
         </div>
       </main>

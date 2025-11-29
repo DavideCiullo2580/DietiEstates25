@@ -1,13 +1,27 @@
 "use client";
 import { useEffect, useState } from "react";
+import FiltroImmobiliForm from "./FiltroImmobiliForm";
 
-export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili }) {
+export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili, aggiornaVisualizzazioni }) {
   const [loading, setLoading] = useState(true);
+  const [showFilter, setShowFilter] = useState(false);
   const [message, setMessage] = useState(null);
   const [messageType, setMessageType] = useState(null);
 
-  const fetchImmobili = async () => {
+  const [filtri, setFiltri] = useState({
+    tipo_annuncio: "",
+    tipo_immobile: "",
+    prezzoMin: "",
+    prezzoMax: "",
+    stanzeMin: "",
+    classeEnergetica: "",
+    comune: "",
+  });
+
+  const fetchImmobili = async (filtriParam = filtri) => {
     setLoading(true);
+    setMessage(null);
+    setMessageType(null);
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -17,8 +31,9 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
         return;
       }
 
-      const res = await fetch("http://localhost:8080/posts/immobili/agente", {
-        headers: { Authorization: "Bearer " + token },
+      const queryParams = new URLSearchParams(filtriParam).toString();
+      const res = await fetch(`http://localhost:8080/posts/immobili/tutti?${queryParams}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!res.ok) throw new Error("Errore nel caricamento immobili");
@@ -34,16 +49,36 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
     }
   };
 
-
   useEffect(() => {
     fetchImmobili();
   }, []);
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Immobili</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Immobili</h1>
+        <button
+          type="button"
+          onClick={() => setShowFilter(!showFilter)}
+          className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800 transition"
+        >
+          {showFilter ? "Chiudi Filtri" : "Filtra"}
+        </button>
+      </div>
 
-      {message && (
+      {showFilter && (
+        <FiltroImmobiliForm
+          filtri={filtri}
+          setFiltri={setFiltri}
+          onApply={(f) => {
+            setFiltri(f);
+            fetchImmobili(f);
+            setShowFilter(false);
+          }}
+        />
+      )}
+
+        {message && (
         <p
           className={`mt-4 text-center font-semibold ${
             messageType === "success" ? "text-green-600" : "text-red-600"
@@ -72,8 +107,28 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
               <p className="text-gray-700 mb-1">💶 €{immobile.prezzo}</p>
               <p className="text-gray-700 mb-3">📐 {immobile.dimensioni} mq</p>
 
+              {/* Indicatori di vicinanza */}
+              <div className="flex flex-wrap gap-2 mb-3">
+                {immobile.vicino_scuole && (
+                  <span className="bg-green-500 text-white text-xs px-2 py-1 rounded">
+                    Vicino a scuole
+                  </span>
+                )}
+                {immobile.vicino_parchi && (
+                  <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                  🌳  Vicino a parchi
+                  </span>
+                )}
+                {immobile.vicino_trasporti && (
+                  <span className="bg-orange-500 text-white text-xs px-2 py-1 rounded">
+                  🚌  Vicino a trasporto pubblico
+                  </span>
+                )}
+              </div>
+
               <button
                 onClick={() => {
+                  aggiornaVisualizzazioni(immobile.id);
                   onSelectImmobile(immobile);
                 }}
                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
@@ -81,6 +136,7 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
                 Visualizza dettagli
               </button>
             </div>
+
           ))}
         </div>
       )}

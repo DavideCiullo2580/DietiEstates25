@@ -3,7 +3,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import NavbarGestore from "../Components/NavbarGestore";
 import Footer from "../Components/Footer";
-import ImmobiliPage from "../Components/ImmobiliPage";
+import ImmobiliPage from "../Components/ListaImmobiliAzienda";
 import ModaleDettagliImmobile from "../Components/ModaleDettagliImmobile";
 
 const MappaImmobili = dynamic(() => import("../Components/MappaImmobili"), { ssr: false });

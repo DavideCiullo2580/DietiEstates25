@@ -33,6 +33,7 @@ export default function MappaImmobili({
   immobili,
   immobileSelezionato,
   onSelectImmobile,
+  aggiornaVisualizzazioni
 }) {
   return (
     <MapContainer
@@ -51,7 +52,10 @@ export default function MappaImmobili({
         key={immobile.id}
         position={[immobile.lat, immobile.lng]}
         eventHandlers={{
-          click: () => onSelectImmobile(immobile),
+          click: () => {
+            aggiornaVisualizzazioni(immobile.id);
+            onSelectImmobile(immobile);
+          }
         }}
       >
         <Popup>

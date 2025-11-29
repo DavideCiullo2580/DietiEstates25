@@ -1,11 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 
-export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili }) {
+export default function ImmobiliAgenteImmobiliare({ onSelectImmobile, setImmobili, immobili }) {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
   const [messageType, setMessageType] = useState(null);
-
 
   const fetchImmobili = async () => {
     setLoading(true);
@@ -18,8 +17,8 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
         return;
       }
 
-      const res = await fetch(`http://localhost:8080/posts/immobili/azienda`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await fetch("http://localhost:8080/posts/immobili/agente", {
+        headers: { Authorization: "Bearer " + token },
       });
 
       if (!res.ok) throw new Error("Errore nel caricamento immobili");
@@ -28,10 +27,13 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
       setImmobili(data);
     } catch (err) {
       console.error("Errore:", err);
+      setMessage("Errore durante il caricamento degli immobili.");
+      setMessageType("error");
     } finally {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchImmobili();
@@ -69,6 +71,24 @@ export default function ListaImmobili({ onSelectImmobile, setImmobili, immobili 
               <p className="text-gray-700 mb-1">📍 {immobile.indirizzo}</p>
               <p className="text-gray-700 mb-1">💶 €{immobile.prezzo}</p>
               <p className="text-gray-700 mb-3">📐 {immobile.dimensioni} mq</p>
+
+             <div className="flex flex-wrap gap-2 mb-3">
+                {immobile.vicino_scuole && (
+                  <span className="bg-green-500 text-white text-xs px-2 py-1 rounded">
+                    🏫 Vicino a scuole
+                  </span>
+                )}
+                {immobile.vicino_parchi && (
+                  <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                    🌳 Vicino a parchi
+                  </span>
+                )}
+                {immobile.vicino_trasporti && (
+                  <span className="bg-orange-500 text-white text-xs px-2 py-1 rounded">
+                    🚌 Trasporto pubblico vicino
+                  </span>
+                )}
+              </div>
 
               <button
                 onClick={() => {

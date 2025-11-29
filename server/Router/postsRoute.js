@@ -667,7 +667,6 @@ router.get("/DashboardImmobili/pdf", authenticateToken, async (req, res) => {
       doc.text(`Descrizione: ${i.descrizione || "N/D"}`);
       doc.text(`Servizi: ${i.servizi || "N/D"}`);
       doc.text(`Comune: ${i.comune || "N/D"}`);
-      doc.text(`Prenotazioni: ${i.visite_prenotate || "N/D"}`);
       doc.moveDown(1);
     });
 
@@ -714,8 +713,6 @@ router.get("/DashboardImmobili/excel", authenticateToken, async (req, res) => {
       { header: "Descrizione", key: "descrizione", width: 30 },
       { header: "Servizi", key: "servizi", width: 30 },
       { header: "Comune", key: "comune", width: 20 },
-      { header: "Prenotazioni", key: "visite_prenotate", width: 20 },
-      
     ];
 
     immobili.forEach((i) => sheet.addRow(i));
