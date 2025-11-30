@@ -165,6 +165,7 @@ export default function DashboardPage() {
                 <p>
                   <strong>Piano:</strong> {immobile.piano || "N/D"}
                 </p>
+                
                 <p>
                   <strong>Classe Energetica:</strong>{" "}
                   {immobile.classe_energetica || "N/D"}
