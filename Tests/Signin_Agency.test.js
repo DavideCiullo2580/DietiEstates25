@@ -1,25 +1,27 @@
-beforeAll(() => {
-  jest.spyOn(console, 'log').mockImplementation(() => {});
-});
-
-afterAll(() => {
-  console.log.mockRestore();
-});
+jest.mock('nodemailer', () => ({
+  createTransport: () => ({
+    sendMail: jest.fn().mockResolvedValue(true), 
+  }),
+}));
 
 const request = require('supertest');
-const app = require('../server/server');
 const pool = require('../server/database');
+const app = require('../server/server');
 
 describe('POST /posts/register-agency', () => {
   const testAgency = {
-    societa: 'testagency',
+    societa: 'testagency_test_name',
     pec: 'testagency@example.com',
     telefono: '1234567890',
   };
 
+  beforeAll(async () => {
+    await pool.query('DELETE FROM users WHERE username = $1', [testAgency.societa]);
+  });
+
   afterAll(async () => {
     await pool.query('DELETE FROM users WHERE username = $1', [testAgency.societa]);
-    await pool.end(); 
+    await pool.end();
   });
 
   test('ritorna 400 se dati mancanti', async () => {
@@ -32,7 +34,6 @@ describe('POST /posts/register-agency', () => {
   });
 
   test('ritorna 409 se azienda già esiste', async () => {
-
     await pool.query(
       `INSERT INTO users (username, password, email, telefono, ruolo, azienda)
        VALUES ($1, 'hashedpass', $2, $3, 'amministratore', $1)
@@ -46,21 +47,22 @@ describe('POST /posts/register-agency', () => {
     expect(res.body.error).toBe('Società già registrata');
   });
 
-  test('registra azienda correttamente e invia mail', async () => {
-
+  test('registra azienda', async () => {
+    const timestamp = Date.now();
     const newAgency = {
-      societa: 'testagency2',
-      pec: 'testagency2@example.com',
+      societa: `testagency_${timestamp}`,
+      pec: `testagency_${timestamp}@example.com`,
       telefono: '0987654321',
     };
-
 
     await pool.query('DELETE FROM users WHERE username = $1', [newAgency.societa]);
 
     const res = await request(app).post('/posts/register-agency').send(newAgency);
 
     expect(res.status).toBe(201);
-    expect(res.body.message).toBe('Azienda registrata con successo. Controlla l\'email per la password.');
+    expect(res.body.message).toBe(
+      "Azienda registrata con successo. Controlla l'email per la password."
+    );
 
     await pool.query('DELETE FROM users WHERE username = $1', [newAgency.societa]);
   });
