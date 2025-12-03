@@ -1,8 +1,12 @@
-jest.mock('nodemailer', () => ({
-  createTransport: () => ({
-    sendMail: jest.fn().mockResolvedValue(true), 
-  }),
-}));
+
+jest.mock('nodemailer', () => {
+  return {
+    createTransport: jest.fn().mockReturnValue({
+      sendMail: jest.fn().mockResolvedValue(true)
+    })
+  };
+});
+
 
 const request = require('supertest');
 const pool = require('../server/database');
@@ -10,7 +14,7 @@ const app = require('../server/server');
 
 describe('POST /posts/register-agency', () => {
   const testAgency = {
-    societa: 'testagency_test_name',
+    societa: 'testagency_test_name.',
     pec: 'testagency@example.com',
     telefono: '1234567890',
   };
@@ -57,7 +61,9 @@ describe('POST /posts/register-agency', () => {
 
     await pool.query('DELETE FROM users WHERE username = $1', [newAgency.societa]);
 
-    const res = await request(app).post('/posts/register-agency').send(newAgency);
+    const res = await request(app)
+      .post('/posts/register-agency')
+      .send(newAgency);
 
     expect(res.status).toBe(201);
     expect(res.body.message).toBe(
