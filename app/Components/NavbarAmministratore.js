@@ -48,7 +48,7 @@ export default function NavBarAmministratore() {
     <nav className="bg-white border-b border-black sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between min-h-[7rem] sm:min-h-[5rem]">
-          <Link href="/" className="flex flex-col sm:flex-row items-center min-w-0">
+          <a className="flex flex-col sm:flex-row items-center min-w-0">
             <Image
               src="/dietiestates25-logo.png"
               alt="DietiEstates25 Logo"
@@ -59,7 +59,7 @@ export default function NavBarAmministratore() {
             <span className="mt-2 sm:mt-0 sm:ml-4 text-xl font-semibold text-black whitespace-nowrap overflow-hidden text-ellipsis sm:max-w-[300px] text-center sm:text-left">
               {azienda}
             </span>
-          </Link>
+          </a>
 
           <div className="relative flex-shrink-0">
             <button
@@ -93,13 +93,12 @@ export default function NavBarAmministratore() {
                 >
                   Cambia password
                 </Link>
-                <Link
-                  href="/"
-                  className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
-                  onClick={() => setMenuOpen(false)}
-                >
+               <button
+                    onClick={() => setShowLogoutModal(true)}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
+                  >
                   Log out
-                </Link>
+                </button>
               </div>
             )}
           </div>

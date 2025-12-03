@@ -49,7 +49,7 @@ export default function NavbarAgenteImmobiliare() {
     <nav className="bg-white border-b border-black sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between min-h-[7rem] sm:min-h-[5rem]">
-          <Link href="/" className="flex flex-col sm:flex-row items-center min-w-0">
+          <a className="flex flex-col sm:flex-row items-center min-w-0">
             <Image
               src="/dietiestates25-logo.png"
               alt="DietiEstates25 Logo"
@@ -60,7 +60,7 @@ export default function NavbarAgenteImmobiliare() {
             <span className="mt-2 sm:mt-0 sm:ml-4 text-xl font-semibold text-black whitespace-nowrap overflow-hidden text-ellipsis sm:max-w-[300px] text-center sm:text-left">
               {azienda || "Caricamento..."}
             </span>
-          </Link>
+          </a>
 
           <div className="relative flex-shrink-0">
             <button

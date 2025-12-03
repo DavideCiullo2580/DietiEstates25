@@ -25,7 +25,7 @@ export default function NavbarUtente() {
     <nav className="bg-white border-b border-black sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between min-h-[7rem] sm:min-h-[5rem]">
-          <Link href="/" className="flex flex-col sm:flex-row items-center min-w-0">
+          <a className="flex flex-col sm:flex-row items-center min-w-0">
             <Image
               src="/dietiestates25-logo.png"
               alt="DietiEstates25 Logo"
@@ -33,7 +33,7 @@ export default function NavbarUtente() {
               height={50}
               className="h-12 w-auto"
             />
-          </Link>
+          </a>
 
           <div className="relative flex-shrink-0">
             <button
